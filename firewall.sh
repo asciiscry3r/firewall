@@ -47,7 +47,7 @@ iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 iptables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
 -m state --state NEW -j REJECT --reject-with tcp-reset
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
---log-prefix "New not syn:"
+--log-prefix "New not syn: "
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
@@ -65,6 +65,44 @@ iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
 iptables -A OUTPUT -p udp --dport 67 -j LOG_AND_DROP
+
+# Ip lists
+iptables -A INPUT -s 0.0.0.0/8 -j LOG_AND_DROP
+iptables -A OUTPUT -s 0.0.0.0/8 -j LOG_AND_DROP
+iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_DROP
+iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
+iptables -A INPUT -s 100.64.0.0/10 -j LOG_AND_DROP
+iptables -A OUTPUT -s 100.64.0.0/10 -j LOG_AND_DROP
+iptables -A INPUT -s 127.0.0.0/8 -j LOG_AND_DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -j LOG_AND_DROP
+iptables -A INPUT -s 127.0.53.53 -j LOG_AND_DROP
+iptables -A OUTPUT -s 127.0.53.53 -j LOG_AND_DROP
+iptables -A INPUT -s 169.254.0.0/16 -j LOG_AND_DROP
+iptables -A OUTPUT -s 169.254.0.0/16 -j LOG_AND_DROP
+
+# iptables -A INPUT -s 172.16.0.0/12 -j LOG_AND_DROP
+# iptables -A OUTPUT -s 172.16.0.0/12 -j LOG_AND_DROP
+iptables -A INPUT -s 192.0.0.0/24 -j LOG_AND_DROP
+iptables -A OUTPUT -s 192.0.0.0/24 -j LOG_AND_DROP
+iptables -A INPUT -s 192.0.2.0/24 -j LOG_AND_DROP
+iptables -A OUTPUT -s 192.0.2.0/24 -j LOG_AND_DROP
+# iptables -A INPUT -s 192.168.0.0/16 -j LOG_AND_DROP
+# iptables -A OUTPUT -s 192.168.0.0/16 -j LOG_AND_DROP
+
+iptables -A INPUT -s 198.18.0.0/15 -j LOG_AND_DROP
+iptables -A OUTPUT -s 198.18.0.0/15 -j LOG_AND_DROP
+iptables -A INPUT -s 198.51.100.0/24 -j LOG_AND_DROP
+iptables -A OUTPUT -s 198.51.100.0/24 -j LOG_AND_DROP
+iptables -A INPUT -s 203.0.113.0/24 -j LOG_AND_DROP
+iptables -A OUTPUT -s 203.0.113.0/24 -j LOG_AND_DROP
+iptables -A INPUT -s 224.0.0.0/4 -j LOG_AND_DROP
+iptables -A OUTPUT -s 224.0.0.0/4 -j LOG_AND_DROP
+iptables -A INPUT -s 240.0.0.0/4 -j LOG_AND_DROP
+iptables -A OUTPUT -s 240.0.0.0/4 -j LOG_AND_DROP
+iptables -A INPUT -s 255.255.255.255/32 -j LOG_AND_DROP
+iptables -A OUTPUT -s 255.255.255.255/32 -j LOG_AND_DROP
+
+# iptables -A OUTPUT -p tcp --dport 80 -j LOG_AND_DROP
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
 # iptables -A INPUT -m set --match-set bogons src -j LOG_AND_DROP
 # 224.0.0.1
@@ -102,7 +140,7 @@ ip6tables -A LOG_AND_REJECT -j REJECT --reject-with icmp6-adm-prohibited
 ip6tables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
 -m state --state NEW -j REJECT --reject-with tcp-reset
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
---log-prefix "New not syn:"
+--log-prefix "New not syn: "
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
@@ -122,7 +160,68 @@ ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
 ip6tables -A OUTPUT -p udp --dport 547 -j LOG_AND_DROP
+# ip6tables -A OUTPUT -p tcp --dport 80 -j LOG_AND_DROP
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
+
+# Ip lists
+ip6tables -A INPUT -s 2002::/24 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002::/24 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:a00::/24 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:a00::/24 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:7f00::/24 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:7f00::/24 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:a9fe::/24 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:a9fe::/24 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:ac10::/28 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:ac10::/28 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:c000::/40 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:c000::/40 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:c000:200::/40 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:c000:200::/40 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:c0a8::/32 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:c0a8::/32 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:c612::/31 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:c612::/31 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:c633:6400::/40 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:c633:6400::/40 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:cb00:7100::/40 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:cb00:7100::/40 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:e000::/20 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:e000::/20 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:f000::/20 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:f000::/20 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2002:ffff:ffff::/48 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2002:ffff:ffff::/48 -j LOG_AND_DROP
+
+ip6tables -A INPUT -s 2001::/40 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001::/40 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:a00::/40 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:a00::/40 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:7f00::/40 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:7f00::/40 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:c000::/56 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:c000::/56 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:ac10::/44 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:ac10::/44 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:a9fe::/48 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:a9fe::/48 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:c000:200::/56 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:c000:200::/56 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:c0a8::/48 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:c0a8::/48 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:c612::/47 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:c612::/47 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:c633:6400::/56 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:c633:6400::/56 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:cb00:7100::/56 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:cb00:7100::/56 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:e000::/36 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:e000::/36 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:f000::/36 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:f000::/36 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:0:ffff:ffff::/64 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:0:ffff:ffff::/64 -j LOG_AND_DROP
+
 # ip6tables -A INPUT -m set --match-set bogonsv6 src -j LOG_AND_DROP
 # ip6tables -A OUTPUT -m set --match-set bogonsv6 src -j LOG_AND_DROP
 # 224.0.0.1
@@ -146,7 +245,7 @@ iptables -t mangle -P PREROUTING ACCEPT
 iptables -t mangle -P POSTROUTING ACCEPT
 iptables -t mangle -P INPUT ACCEPT
 iptables -t mangle -P OUTPUT ACCEPT
-iptables -t mangle-P FORWARD ACCEPT
+iptables -t mangle -P FORWARD ACCEPT
 
 
 ip6tables -t nat -P PREROUTING ACCEPT
