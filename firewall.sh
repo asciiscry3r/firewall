@@ -1,4 +1,8 @@
 #!/usr/bin/env bash
+# Klimenko Maxim Sergievich 2022
+# https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#PROTOCOLSTXT
+# https://wiki.archlinux.org/title/simple_stateful_firewall
+# https://ipgeolocation.io/resources/bogon.html
 
 iptables -F
 iptables -t nat -F
@@ -20,8 +24,9 @@ ip6tables -X
 ip6tables -t nat -X
 ip6tables -t mangle -X
 
-# https://www.frozentux.net/iptables-tutorial/iptables-tutorial.html#PROTOCOLSTXT
-# https://wiki.archlinux.org/title/simple_stateful_firewall
+#
+# AAAA
+#
 
 iptables -N TCP
 iptables -N UDP
