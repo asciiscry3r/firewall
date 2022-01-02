@@ -46,31 +46,6 @@ iptables -A LOG_AND_DROP -j DROP
 iptables -A LOG_AND_REJECT -j LOG --log-prefix "iptables reject: " --log-level 7
 iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 
-# From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
-# Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
-# bad_tcp_packets chain
-iptables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
--m state --state NEW -j REJECT --reject-with tcp-reset
-iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
---log-prefix "New not syn: "
-iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
-
-iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-iptables -A INPUT -i lo -j ACCEPT
-iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
-iptables -A INPUT -m conntrack --ctstate INVALID -j LOG_AND_DROP
-iptables -A INPUT -p udp -m conntrack --ctstate NEW -j UDP
-iptables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
-iptables -A INPUT -p tcp -j bad_tcp_packets
-iptables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT --reject-with tcp-reset
-iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachabl
-iptables -A INPUT -p dccp -j LOG_AND_DROP
-iptables -A INPUT -p sctp -j LOG_AND_DROP
-iptables -A OUTPUT -p dccp -j LOG_AND_DROP
-iptables -A OUTPUT -p sctp -j LOG_AND_DROP
-iptables -A OUTPUT -p tcp -j bad_tcp_packets
-iptables -A OUTPUT -p udp --dport 67 -j LOG_AND_DROP
-
 # Ip lists
 iptables -A INPUT -s 0.0.0.0/8 -j LOG_AND_DROP
 iptables -A OUTPUT -s 0.0.0.0/8 -j LOG_AND_DROP
@@ -78,8 +53,8 @@ iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_DROP
 iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
 iptables -A INPUT -s 100.64.0.0/10 -j LOG_AND_DROP
 iptables -A OUTPUT -s 100.64.0.0/10 -j LOG_AND_DROP
-iptables -A INPUT -s 127.0.0.0/8 -j LOG_AND_DROP
-iptables -A OUTPUT -s 127.0.0.0/8 -j LOG_AND_DROP
+# iptables -A INPUT -s 127.0.0.2/8 -j LOG_AND_DROP
+# iptables -A OUTPUT -s 127.0.0.2/8 -j LOG_AND_DROP
 iptables -A INPUT -s 127.0.53.53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.53.53 -j LOG_AND_DROP
 iptables -A INPUT -s 169.254.0.0/16 -j LOG_AND_DROP
@@ -106,6 +81,32 @@ iptables -A INPUT -s 240.0.0.0/4 -j LOG_AND_DROP
 iptables -A OUTPUT -s 240.0.0.0/4 -j LOG_AND_DROP
 iptables -A INPUT -s 255.255.255.255/32 -j LOG_AND_DROP
 iptables -A OUTPUT -s 255.255.255.255/32 -j LOG_AND_DROP
+
+# From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
+# Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
+# bad_tcp_packets chain
+iptables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
+-m state --state NEW -j REJECT --reject-with tcp-reset
+iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
+--log-prefix "New not syn: "
+iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
+
+iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
+iptables -A INPUT -i lo -j bad_tcp_packets
+iptables -A OUTPUT -i lo -j bad_tcp_packets
+iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
+iptables -A INPUT -m conntrack --ctstate INVALID -j LOG_AND_DROP
+iptables -A INPUT -p udp -m conntrack --ctstate NEW -j UDP
+iptables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
+iptables -A INPUT -p tcp -j bad_tcp_packets
+iptables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT --reject-with tcp-reset
+iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachabl
+iptables -A INPUT -p dccp -j LOG_AND_DROP
+iptables -A INPUT -p sctp -j LOG_AND_DROP
+iptables -A OUTPUT -p dccp -j LOG_AND_DROP
+iptables -A OUTPUT -p sctp -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp -j bad_tcp_packets
+iptables -A OUTPUT -p udp --dport 67 -j LOG_AND_DROP
 
 # iptables -A OUTPUT -p tcp --dport 80 -j LOG_AND_DROP
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
@@ -149,7 +150,8 @@ ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-ip6tables -A INPUT -i lo -j ACCEPT
+ip6tables -A INPUT -i lo -j bad_tcp_packets
+ip6tables -A OUTPUT -i lo -j bad_tcp_packets
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
 # ip6tables -A INPUT -s fe80::/10 -p ipv6-icmp -j ACCEPT
 # ip6tables -A INPUT -p udp --sport 547 --dport 546 -j ACCEPT
@@ -173,8 +175,8 @@ ip6tables -A INPUT -s 2002::/24 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s 2002::/24 -j LOG_AND_DROP
 ip6tables -A INPUT -s 2002:a00::/24 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s 2002:a00::/24 -j LOG_AND_DROP
-ip6tables -A INPUT -s 2002:7f00::/24 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s 2002:7f00::/24 -j LOG_AND_DROP
+# ip6tables -A INPUT -s 2002:7f00::/24 -j LOG_AND_DROP
+# ip6tables -A OUTPUT -s 2002:7f00::/24 -j LOG_AND_DROP
 ip6tables -A INPUT -s 2002:a9fe::/24 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s 2002:a9fe::/24 -j LOG_AND_DROP
 ip6tables -A INPUT -s 2002:ac10::/28 -j LOG_AND_DROP
