@@ -141,6 +141,29 @@ ip6tables -A LOG_AND_REJECT -j LOG --log-prefix "ip6tables reject: " --log-level
 ip6tables -A LOG_AND_REJECT -j REJECT --reject-with icmp6-adm-prohibited
 
 # Ip lists
+ip6tables -A INPUT -s ::/128 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::/128 -j LOG_AND_DROP
+ip6tables -A INPUT -s ::1/128 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/128 -j LOG_AND_DROP
+ip6tables -A INPUT -s ::ffff:0:0/96 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::ffff:0:0/96 -j LOG_AND_DROP
+ip6tables -A INPUT -s ::/96 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::/96 -j LOG_AND_DROP
+ip6tables -A INPUT -s 100::/64 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 100::/64 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:10::/28 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:10::/28 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2001:db8::/32 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s 2001:db8::/32 -j LOG_AND_DROP
+ip6tables -A INPUT -s fc00::/7 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s fc00::/7	-j LOG_AND_DROP
+ip6tables -A INPUT -s fe80::/10 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s fe80::/10 -j LOG_AND_DROP
+ip6tables -A INPUT -s fec0::/10	-j LOG_AND_DROP
+ip6tables -A OUTPUT -s fec0::/10 -j LOG_AND_DROP
+ip6tables -A INPUT -s ff00::/8 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ff00::/8 -j LOG_AND_DROP
+
 ip6tables -A INPUT -s 2002::/24 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s 2002::/24 -j LOG_AND_DROP
 ip6tables -A INPUT -s 2002:a00::/24 -j LOG_AND_DROP
