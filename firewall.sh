@@ -92,8 +92,9 @@ iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-iptables -A INPUT -i lo -j bad_tcp_packets
-iptables -A OUTPUT -i lo -j bad_tcp_packets
+iptables -A INPUT -i lo -j ACCEPT
+# iptables -A INPUT -i lo -j bad_tcp_packets
+# iptables -A OUTPUT -i lo -j bad_tcp_packets
 iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
 iptables -A INPUT -m conntrack --ctstate INVALID -j LOG_AND_DROP
 iptables -A INPUT -p udp -m conntrack --ctstate NEW -j UDP
@@ -287,3 +288,16 @@ ip6tables -t mangle -P POSTROUTING ACCEPT
 ip6tables -t mangle -P INPUT ACCEPT
 ip6tables -t mangle -P OUTPUT ACCEPT
 ip6tables -t mangle -P FORWARD ACCEPT
+
+#################
+
+iptables-save > /etc/iptables/iptables.rules
+ip6tables-save > /etc/iptables/ip6tables.rules
+
+systemctl enable iptables
+systemctl start iptables
+systemctl restart iptables
+
+systemctl enable ip6tables
+systemctl start ip6tables
+systemctl restart ip6tables
