@@ -31,6 +31,7 @@ ip6tables -t mangle -X
 iptables -N TCP
 iptables -N UDP
 iptables -N LOG
+# iptables -N IN_SSH
 iptables -N LOG_AND_DROP
 iptables -N LOG_AND_REJECT
 iptables -N bad_tcp_packets
@@ -102,6 +103,11 @@ iptables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
 iptables -A INPUT -p tcp -j bad_tcp_packets
 iptables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT --reject-with tcp-reset
 iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachabl
+# SSH
+# iptables -A INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -j IN_SSH
+# iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 3 --seconds 10 -j LOG_AND_DROP
+# iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 4 --seconds 1800 -j LOG_AND_DROP 
+# iptables -A IN_SSH -m recent --name sshbf --set -j ACCEPT
 iptables -A INPUT -p dccp -j LOG_AND_DROP
 iptables -A INPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
