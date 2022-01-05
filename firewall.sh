@@ -102,9 +102,9 @@ iptables -A INPUT -p udp -m conntrack --ctstate NEW -j UDP
 iptables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
 iptables -A INPUT -p tcp -j bad_tcp_packets
 iptables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT --reject-with tcp-reset
-iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachabl
+iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachable
 # SSH
-# iptables -A INPUT -p tcp --dport ssh -m conntrack --ctstate NEW -j IN_SSH
+# iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
 # iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 3 --seconds 10 -j LOG_AND_DROP
 # iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 4 --seconds 1800 -j LOG_AND_DROP 
 # iptables -A IN_SSH -m recent --name sshbf --set -j ACCEPT
