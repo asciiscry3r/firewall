@@ -31,7 +31,7 @@ ip6tables -t mangle -X
 iptables -N TCP
 iptables -N UDP
 iptables -N LOG
-# iptables -N IN_SSH
+# iptables -N IN_SSH # Uncomment if you need ssh connection to machine
 iptables -N LOG_AND_DROP
 iptables -N LOG_AND_REJECT
 iptables -N bad_tcp_packets
@@ -97,7 +97,7 @@ iptables -A INPUT -i lo -j ACCEPT
 # iptables -A INPUT -i lo -j bad_tcp_packets
 # iptables -A OUTPUT -i lo -j bad_tcp_packets
 iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
-# SSH
+# SSH  # Uncomment if you need ssh connection to machine 
 # iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
 # iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 3 --seconds 10 -j LOG_AND_DROP
 # iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 4 --seconds 1800 -j LOG_AND_DROP 
