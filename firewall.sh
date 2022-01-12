@@ -54,8 +54,8 @@ iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_DROP
 iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
 iptables -A INPUT -s 100.64.0.0/10 -j LOG_AND_DROP
 iptables -A OUTPUT -s 100.64.0.0/10 -j LOG_AND_DROP
-# iptables -A INPUT -s 127.0.0.2/8 -j LOG_AND_DROP
-# iptables -A OUTPUT -s 127.0.0.2/8 -j LOG_AND_DROP
+# iptables -A INPUT -s 127.0.0.1/8 -j LOG_AND_DROP
+# iptables -A OUTPUT -s 127.0.0.1/8 -j LOG_AND_DROP
 iptables -A INPUT -s 127.0.53.53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.53.53 -j LOG_AND_DROP
 iptables -A INPUT -s 169.254.0.0/16 -j LOG_AND_DROP
@@ -93,7 +93,7 @@ iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-iptables -A INPUT -i lo -j ACCEPT
+iptables -A INPUT -i lo -s 127.0.0.1 -j ACCEPT
 # iptables -A INPUT -i lo -j bad_tcp_packets
 # iptables -A OUTPUT -i lo -j bad_tcp_packets
 iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
