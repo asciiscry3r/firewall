@@ -102,6 +102,7 @@ iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
 # iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 3 --seconds 10 -j LOG_AND_DROP
 # iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 4 --seconds 1800 -j LOG_AND_DROP 
 # iptables -A IN_SSH -m recent --name sshbf --set -j ACCEPT
+iptables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j DROP
 iptables -A INPUT -m conntrack --ctstate INVALID -j LOG_AND_DROP
 iptables -A INPUT -p udp -m conntrack --ctstate NEW -j UDP
 iptables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
@@ -243,6 +244,7 @@ ip6tables -A INPUT -i lo -j ACCEPT
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
 # ip6tables -A INPUT -s fe80::/10 -p ipv6-icmp -j ACCEPT
 # ip6tables -A INPUT -p udp --sport 547 --dport 546 -j ACCEPT
+ip6tables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j DROP
 ip6tables -A INPUT -m conntrack --ctstate INVALID -j LOG_AND_DROP
 ip6tables -A INPUT -p udp -m conntrack --ctstate NEW -j UDP
 ip6tables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
