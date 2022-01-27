@@ -87,6 +87,9 @@ iptables -A OUTPUT -s 255.255.255.255/32 -j LOG_AND_DROP
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
 # bad_tcp_packets chain
+iptables -A bad_tcp_packets -p tcp -m length --length 20 -j LOG \
+--log-prefix "Empty packets: "
+iptables -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
 iptables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
 -m state --state NEW -j REJECT --reject-with tcp-reset
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
@@ -236,6 +239,9 @@ ip6tables -A OUTPUT -s 2001:0:ffff:ffff::/64 -j LOG_AND_DROP
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
 # bad_tcp_packets chain
+ip6tables -A bad_tcp_packets -p tcp -m length --length 20 -j LOG \
+--log-prefix "Empty packets: "
+ip6tables -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
 ip6tables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
 -m state --state NEW -j REJECT --reject-with tcp-reset
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
