@@ -248,12 +248,10 @@ ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 ip6tables -A INPUT -i lo -j ACCEPT
-# ip6tables -A INPUT -p icmp -m icmpv6 --icmpv6-type address-mask-request -j LOG_AND_DROP # error
-# ip6tables -A INPUT -p icmp -m icmpv6 --icmpv6-type timestamp-reques -j LOG_AND_DROP # error
-ip6tables -A INPUT -p icmpv6 --icmpv6-type destination-unreachable -j LOG_AND_DROP
-ip6tables -A INPUT -p icmpv6 --icmpv6-type packet-too-big -j LOG_AND_DROP
-ip6tables -A INPUT -p icmpv6 --icmpv6-type time-exceeded -j LOG_AND_DROP
-ip6tables -A INPUT -p icmpv6 --icmpv6-type parameter-problem -j LOG_AND_DROP
+ip6tables -A INPUT -p ipv6-icmp --icmpv6-type destination-unreachable -j LOG_AND_DROP
+ip6tables -A INPUT -p ipv6-icmp --icmpv6-type packet-too-big -j LOG_AND_DROP
+ip6tables -A INPUT -p ipv6-icmp --icmpv6-type time-exceeded -j LOG_AND_DROP
+ip6tables -A INPUT -p ipv6-icmp --icmpv6-type parameter-problem -j LOG_AND_DROP
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
 # ip6tables -A INPUT -s fe80::/10 -p ipv6-icmp -j ACCEPT
 # ip6tables -A INPUT -p udp --sport 547 --dport 546 -j ACCEPT
