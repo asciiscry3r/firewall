@@ -31,13 +31,10 @@ ip6tables -t mangle -X
 
 iptables -N TCP
 iptables -N UDP
-iptables -N LOG
 # iptables -N IN_SSH # Uncomment if you need ssh connection to machine
 iptables -N LOG_AND_DROP
 iptables -N LOG_AND_REJECT
 iptables -N bad_tcp_packets
-# iptables -N DCCP
-# iptables -N SCTP
 
 iptables -P FORWARD DROP
 iptables -P OUTPUT ACCEPT
@@ -98,8 +95,9 @@ iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A INPUT -i lo -s 127.0.0.1 -j ACCEPT
-# iptables -A INPUT -i lo -j bad_tcp_packets
-# iptables -A OUTPUT -i lo -j bad_tcp_packets
+iptables -A INPUT -p icmp --icmp-type address-mask-request -j LOG_AND_DROP
+iptables -A INPUT -p icmp --icmp-type timestamp-request -j LOG_AND_DROP
+iptables -A INPUT -p icmp --icmp-type router-solicitation -j LOG_AND_DROP
 iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
 # SSH  # Uncomment if you need ssh connection to machine 
 # iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
@@ -107,8 +105,6 @@ iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
 # iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 4 --seconds 1800 -j LOG_AND_DROP 
 # iptables -A IN_SSH -m recent --name sshbf --set -j ACCEPT
 iptables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
-iptables -A INPUT -p icmp -m icmp --icmp-type address-mask-request -j LOG_AND_DROP
-iptables -A INPUT -p icmp -m icmp --icmp-type timestamp-request -j LOG_AND_DROP
 iptables -A INPUT -f -j LOG_AND_DROP
 iptables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_DROP
 iptables -A INPUT -p tcp --tcp-flags ALL NONE -j LOG_AND_DROP
@@ -123,7 +119,7 @@ iptables -A INPUT -p dccp -j LOG_AND_DROP
 iptables -A INPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
-iptables -A OUTPUT -f -j DROP
+iptables -A OUTPUT -f -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
 iptables -A OUTPUT -p udp --dport 67 -j LOG_AND_DROP
 
@@ -143,12 +139,9 @@ iptables -A INPUT -j LOG_AND_REJECT
 
 ip6tables -N TCP
 ip6tables -N UDP
-ip6tables -N LOG
 ip6tables -N LOG_AND_DROP
 ip6tables -N LOG_AND_REJECT
 ip6tables -N bad_tcp_packets
-# ip6tables -N DCCP
-# ip6tables -N SCTP
 
 ip6tables -P FORWARD DROP
 ip6tables -P OUTPUT ACCEPT
@@ -276,6 +269,7 @@ ip6tables -A INPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
+ip6tables -A OUTPUT -f -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 547 -j LOG_AND_DROP
 # ip6tables -A OUTPUT -p tcp --dport 80 -j LOG_AND_DROP
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
