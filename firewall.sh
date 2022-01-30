@@ -51,8 +51,8 @@ iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 # Ip lists
 iptables -A INPUT -s 0.0.0.0/8 -j LOG_AND_DROP
 iptables -A OUTPUT -s 0.0.0.0/8 -j LOG_AND_DROP
-iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_DROP
-iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
+#iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_DROP
+#iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
 iptables -A INPUT -s 100.64.0.0/10 -j LOG_AND_DROP
 iptables -A OUTPUT -s 100.64.0.0/10 -j LOG_AND_DROP
 # iptables -A INPUT -s 127.0.0.1/8 -j LOG_AND_DROP
@@ -109,6 +109,10 @@ iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
 iptables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
 iptables -A INPUT -p icmp -m icmp --icmp-type address-mask-request -j LOG_AND_DROP
 iptables -A INPUT -p icmp -m icmp --icmp-type timestamp-request -j LOG_AND_DROP
+iptables -A INPUT -f -j LOG_AND_DROP
+iptables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_DROP
+iptables -A INPUT -p tcp --tcp-flags ALL NONE -j LOG_AND_DROP
+iptables -A INPUT -p tcp -m tcp --tcp-flags RST RST -m limit --limit 2/second --limit-burst 2 -j ACCEPT
 iptables -A INPUT -m conntrack --ctstate INVALID -j LOG_AND_DROP
 iptables -A INPUT -p udp -m conntrack --ctstate NEW -j UDP
 iptables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
@@ -119,6 +123,7 @@ iptables -A INPUT -p dccp -j LOG_AND_DROP
 iptables -A INPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
+iptables -A OUTPUT -f -j DROP
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
 iptables -A OUTPUT -p udp --dport 67 -j LOG_AND_DROP
 
@@ -254,8 +259,12 @@ ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j 
 # ip6tables -A INPUT -s fe80::/10 -p ipv6-icmp -j ACCEPT
 # ip6tables -A INPUT -p udp --sport 547 --dport 546 -j ACCEPT
 ip6tables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
-ip6tables -A INPUT -p icmp -m icmp --icmp-type address-mask-request -j LOG_AND_DROP
-ip6tables -A INPUT -p icmp -m icmp --icmp-type timestamp-request -j LOG_AND_DROP
+ip6tables -A INPUT -p icmp -m icmpv6 --icmpv6-type address-mask-request -j LOG_AND_DROP # error
+ip6tables -A INPUT -p icmp -m icmpv6 --icmpv6-type timestamp-reques -j LOG_AND_DROP # error
+ip6tables -A INPUT -f -j LOG_AND_DROP
+ip6tables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_DROP
+ip6tables -A INPUT -p tcp --tcp-flags ALL NONE -j LOG_AND_DROP
+ip6tables -A INPUT -p tcp -m tcp --tcp-flags RST RST -m limit --limit 2/second --limit-burst 2 -j ACCEPT
 ip6tables -A INPUT -m conntrack --ctstate INVALID -j LOG_AND_DROP
 ip6tables -A INPUT -p udp -m conntrack --ctstate NEW -j UDP
 ip6tables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
