@@ -291,26 +291,26 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 # NAT and Mangle #
 ##################
 
-iptables -t nat -P PREROUTING ACCEPT
-iptables -t nat -P POSTROUTING ACCEPT
-iptables -t nat -P OUTPUT ACCEPT
+# iptables -t nat -P PREROUTING ACCEPT
+# iptables -t nat -P POSTROUTING ACCEPT
+# iptables -t nat -P OUTPUT ACCEPT
 
-iptables -t mangle -P PREROUTING ACCEPT
-iptables -t mangle -P POSTROUTING ACCEPT
-iptables -t mangle -P INPUT ACCEPT
-iptables -t mangle -P OUTPUT ACCEPT
-iptables -t mangle -P FORWARD ACCEPT
+# iptables -t mangle -P PREROUTING ACCEPT
+# iptables -t mangle -P POSTROUTING ACCEPT
+# iptables -t mangle -P INPUT ACCEPT
+# iptables -t mangle -P OUTPUT ACCEPT
+# iptables -t mangle -P FORWARD ACCEPT
 
 
-ip6tables -t nat -P PREROUTING ACCEPT
-ip6tables -t nat -P POSTROUTING ACCEPT
-ip6tables -t nat -P OUTPUT ACCEPT
+# ip6tables -t nat -P PREROUTING ACCEPT
+# ip6tables -t nat -P POSTROUTING ACCEPT
+# ip6tables -t nat -P OUTPUT ACCEPT
 
-ip6tables -t mangle -P PREROUTING ACCEPT
-ip6tables -t mangle -P POSTROUTING ACCEPT
-ip6tables -t mangle -P INPUT ACCEPT
-ip6tables -t mangle -P OUTPUT ACCEPT
-ip6tables -t mangle -P FORWARD ACCEPT
+# ip6tables -t mangle -P PREROUTING ACCEPT
+# ip6tables -t mangle -P POSTROUTING ACCEPT
+# ip6tables -t mangle -P INPUT ACCEPT
+# ip6tables -t mangle -P OUTPUT ACCEPT
+# ip6tables -t mangle -P FORWARD ACCEPT
 
 #################
 
