@@ -48,8 +48,10 @@ iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 # Ip lists
 iptables -A INPUT -s 0.0.0.0/8 -j LOG_AND_DROP
 iptables -A OUTPUT -s 0.0.0.0/8 -j LOG_AND_DROP
+# Comment this and rerun script for get acces to most networks provided by vpn services
 iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_DROP
 iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
+#
 iptables -A INPUT -s 100.64.0.0/10 -j LOG_AND_DROP
 iptables -A OUTPUT -s 100.64.0.0/10 -j LOG_AND_DROP
 # iptables -A INPUT -s 127.0.0.1/8 -j LOG_AND_DROP
