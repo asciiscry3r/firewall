@@ -48,8 +48,8 @@ iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 # Ip lists
 iptables -A INPUT -s 0.0.0.0/8 -j LOG_AND_DROP
 iptables -A OUTPUT -s 0.0.0.0/8 -j LOG_AND_DROP
-#iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_DROP
-#iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
+# iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_DROP
+# iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
 iptables -A INPUT -s 100.64.0.0/10 -j LOG_AND_DROP
 iptables -A OUTPUT -s 100.64.0.0/10 -j LOG_AND_DROP
 # iptables -A INPUT -s 127.0.0.1/8 -j LOG_AND_DROP
@@ -248,13 +248,17 @@ ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 ip6tables -A INPUT -i lo -j ACCEPT
+# ip6tables -A INPUT -p icmp -m icmpv6 --icmpv6-type address-mask-request -j LOG_AND_DROP # error
+# ip6tables -A INPUT -p icmp -m icmpv6 --icmpv6-type timestamp-reques -j LOG_AND_DROP # error
+ip6tables -A INPUT -p icmpv6 --icmpv6-type destination-unreachable -j LOG_AND_DROP
+ip6tables -A INPUT -p icmpv6 --icmpv6-type packet-too-big -j LOG_AND_DROP
+ip6tables -A INPUT -p icmpv6 --icmpv6-type time-exceeded -j LOG_AND_DROP
+ip6tables -A INPUT -p icmpv6 --icmpv6-type parameter-problem -j LOG_AND_DROP
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
 # ip6tables -A INPUT -s fe80::/10 -p ipv6-icmp -j ACCEPT
 # ip6tables -A INPUT -p udp --sport 547 --dport 546 -j ACCEPT
 ip6tables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
-ip6tables -A INPUT -p icmp -m icmpv6 --icmpv6-type address-mask-request -j LOG_AND_DROP # error
-ip6tables -A INPUT -p icmp -m icmpv6 --icmpv6-type timestamp-reques -j LOG_AND_DROP # error
-ip6tables -A INPUT -f -j LOG_AND_DROP
+ip6tables -A INPUT -m ipv6header --header frag --soft -j LOG_AND_DROP
 ip6tables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_DROP
 ip6tables -A INPUT -p tcp --tcp-flags ALL NONE -j LOG_AND_DROP
 ip6tables -A INPUT -p tcp -m tcp --tcp-flags RST RST -m limit --limit 2/second --limit-burst 2 -j ACCEPT
@@ -269,7 +273,7 @@ ip6tables -A INPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
-ip6tables -A OUTPUT -f -j LOG_AND_DROP
+ip6tables -A OUTPUT -m ipv6header --header frag --soft -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 547 -j LOG_AND_DROP
 # ip6tables -A OUTPUT -p tcp --dport 80 -j LOG_AND_DROP
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
