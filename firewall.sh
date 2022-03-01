@@ -49,8 +49,8 @@ iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 iptables -A INPUT -s 0.0.0.0/8 -j LOG_AND_REJECT
 iptables -A OUTPUT -s 0.0.0.0/8 -j LOG_AND_DROP
 # Comment this and rerun script for get access to most networks provided by vpn services
-# iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_REJECT
-# iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
+iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_REJECT
+iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
 # #####################################################################################
 iptables -A INPUT -s 100.64.0.0/10 -j LOG_AND_REJECT
 iptables -A OUTPUT -s 100.64.0.0/10 -j LOG_AND_DROP
@@ -82,6 +82,8 @@ iptables -A INPUT -s 240.0.0.0/4 -j LOG_AND_REJECT
 iptables -A OUTPUT -s 240.0.0.0/4 -j LOG_AND_DROP
 iptables -A INPUT -s 255.255.255.255/32 -j LOG_AND_REJECT
 iptables -A OUTPUT -s 255.255.255.255/32 -j LOG_AND_DROP
+iptables -A INPUT -s 35.190.56.182/32 -j LOG_AND_REJECT
+iptables -A OUTPUT -s 35.190.56.182/32 -j LOG_AND_DROP
 
 
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
@@ -172,6 +174,8 @@ ip6tables -A INPUT -s fec0::/10	-j LOG_AND_REJECT
 ip6tables -A OUTPUT -s fec0::/10 -j LOG_AND_DROP
 ip6tables -A INPUT -s ff00::/8 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s ff00::/8 -j LOG_AND_DROP
+ip6tables -A INPUT -s 2600:1901:0:8813::/128 -j LOG_AND_REJECT
+ip6tables -A OUTPUT -s 2600:1901:0:8813::/128 -j LOG_AND_DROP
 
 ip6tables -A INPUT -s 2002::/24 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s 2002::/24 -j LOG_AND_DROP
@@ -228,8 +232,7 @@ ip6tables -A INPUT -s 2001:0:e000::/36 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s 2001:0:e000::/36 -j LOG_AND_DROP
 ip6tables -A INPUT -s 2001:0:f000::/36 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s 2001:0:f000::/36 -j LOG_AND_DROP
-ip6tables -A INPUT -s 2001:0:ffff:ffff::/64 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -s 2001:0:ffff:ffff::/64 -j LOG_AND_DROP
+
 
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
