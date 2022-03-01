@@ -31,7 +31,6 @@ ip6tables -t mangle -X
 
 iptables -N TCP
 iptables -N UDP
-# iptables -N IN_SSH # Uncomment if you need ssh connection to machine
 iptables -N LOG_AND_DROP
 iptables -N LOG_AND_REJECT
 iptables -N bad_tcp_packets
@@ -45,45 +44,16 @@ iptables -A LOG_AND_DROP -j DROP
 iptables -A LOG_AND_REJECT -j LOG --log-prefix "iptables reject: " --log-level 7
 iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 
-# Ip lists
-iptables -A INPUT -s 0.0.0.0/8 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 0.0.0.0/8 -j LOG_AND_DROP
 # Comment this and rerun script for get access to most networks provided by vpn services
-iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
+#iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_REJECT
+#iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
 # #####################################################################################
-iptables -A INPUT -s 100.64.0.0/10 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 100.64.0.0/10 -j LOG_AND_DROP
 # iptables -A INPUT -s 127.0.0.1/8 -j LOG_AND_REJECT
 # iptables -A OUTPUT -s 127.0.0.1/8 -j LOG_AND_DROP
-iptables -A INPUT -s 127.0.53.53 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 127.0.53.53 -j LOG_AND_DROP
-iptables -A INPUT -s 169.254.0.0/16 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 169.254.0.0/16 -j LOG_AND_DROP
-
-iptables -A INPUT -s 172.16.0.0/12 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 172.16.0.0/12 -j LOG_AND_DROP
-iptables -A INPUT -s 192.0.0.0/24 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 192.0.0.0/24 -j LOG_AND_DROP
-iptables -A INPUT -s 192.0.2.0/24 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 192.0.2.0/24 -j LOG_AND_DROP
 # iptables -A INPUT -s 192.168.0.0/16 -j LOG_AND_REJECT
 # iptables -A OUTPUT -s 192.168.0.0/16 -j LOG_AND_DROP
 
-iptables -A INPUT -s 198.18.0.0/15 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 198.18.0.0/15 -j LOG_AND_DROP
-iptables -A INPUT -s 198.51.100.0/24 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 198.51.100.0/24 -j LOG_AND_DROP
-iptables -A INPUT -s 203.0.113.0/24 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 203.0.113.0/24 -j LOG_AND_DROP
-iptables -A INPUT -s 224.0.0.0/4 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 224.0.0.0/4 -j LOG_AND_DROP
-iptables -A INPUT -s 240.0.0.0/4 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 240.0.0.0/4 -j LOG_AND_DROP
-iptables -A INPUT -s 255.255.255.255/32 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 255.255.255.255/32 -j LOG_AND_DROP
-iptables -A INPUT -s 35.190.56.182/32 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 35.190.56.182/32 -j LOG_AND_DROP
+BLOCKLIST="0.0.0.0/8,10.0.0.0/8,100.64.0.0/10,127.0.53.53,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,240.0.0.0/4,255.255.255.255/32,35.190.56.182/32"
 
 
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
@@ -122,6 +92,8 @@ iptables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT
 iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachable
 iptables -A INPUT -p dccp -j LOG_AND_REJECT
 iptables -A INPUT -p sctp -j LOG_AND_REJECT
+iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
+iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -f -j LOG_AND_DROP
@@ -174,6 +146,7 @@ ip6tables -A INPUT -s fec0::/10	-j LOG_AND_REJECT
 ip6tables -A OUTPUT -s fec0::/10 -j LOG_AND_DROP
 ip6tables -A INPUT -s ff00::/8 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s ff00::/8 -j LOG_AND_DROP
+
 ip6tables -A INPUT -s 2600:1901:0:8813::/128 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s 2600:1901:0:8813::/128 -j LOG_AND_DROP
 
