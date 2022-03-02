@@ -74,7 +74,7 @@ iptables -A INPUT -p icmp --icmp-type address-mask-request -j LOG_AND_REJECT
 iptables -A INPUT -p icmp --icmp-type timestamp-request -j LOG_AND_REJECT
 iptables -A INPUT -p icmp --icmp-type router-solicitation -j LOG_AND_REJECT
 iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
-iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
+# iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
 # SSH  # Uncomment if you need ssh connection to machine 
 # iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
 # iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 3 --seconds 10 -j LOG_AND_REJECT
@@ -93,7 +93,7 @@ iptables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT
 iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachable
 iptables -A INPUT -p dccp -j LOG_AND_REJECT
 iptables -A INPUT -p sctp -j LOG_AND_REJECT
-#iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
+iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
 iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
@@ -146,7 +146,7 @@ ip6tables -A INPUT -p ipv6-icmp --icmpv6-type packet-too-big -j LOG_AND_REJECT
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type time-exceeded -j LOG_AND_REJECT
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type parameter-problem -j LOG_AND_REJECT
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
-ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
+# ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 # ip6tables -A INPUT -s fe80::/10 -p ipv6-icmp -j ACCEPT
 # ip6tables -A INPUT -p udp --sport 547 --dport 546 -j ACCEPT
 ip6tables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
@@ -162,7 +162,7 @@ ip6tables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJEC
 ip6tables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp6-adm-prohibited
 ip6tables -A INPUT -p dccp -j LOG_AND_REJECT
 ip6tables -A INPUT -p sctp -j LOG_AND_REJECT
-#ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
+ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
