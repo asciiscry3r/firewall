@@ -143,7 +143,7 @@ ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
-ip6tables -A INPUT -i lo -s ::/1 -j ACCEPT
+ip6tables -A INPUT -i lo -s ::1 -j ACCEPT
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type destination-unreachable -j LOG_AND_REJECT
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type packet-too-big -j LOG_AND_REJECT
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type time-exceeded -j LOG_AND_REJECT
