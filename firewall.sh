@@ -18,9 +18,11 @@ iptables -t mangle -X
 ip6tables -F
 ip6tables -t nat -F
 ip6tables -t mangle -F
+
 #
 # erase all chains that's not default in filter and nat table.
 #
+
 ip6tables -X
 ip6tables -t nat -X
 ip6tables -t mangle -X
@@ -45,8 +47,8 @@ iptables -A LOG_AND_REJECT -j LOG --log-prefix "iptables reject: " --log-level 7
 iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 
 # Comment this and rerun script for get access to most networks provided by vpn services
-#iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_REJECT
-#iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
+# iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_REJECT
+# iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
 # #####################################################################################
 # iptables -A INPUT -s 127.0.0.1/8 -j LOG_AND_REJECT
 # iptables -A OUTPUT -s 127.0.0.1/8 -j LOG_AND_DROP
@@ -65,7 +67,7 @@ iptables -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
 iptables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
 -m state --state NEW -j REJECT --reject-with tcp-reset
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
---log-prefix "New not syn: "
+--log-prefix "Drop new not syn: "
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
@@ -96,6 +98,10 @@ iptables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT
 iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachable
 iptables -A INPUT -p dccp -j LOG_AND_REJECT
 iptables -A INPUT -p sctp -j LOG_AND_REJECT
+iptables -A INPUT -p udp --sport 0 -j LOG_AND_REJECT
+iptables -A INPUT -p udp --dport 0 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --sport 0 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --dport 0 -j LOG_AND_REJECT
 iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
 iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
@@ -103,7 +109,10 @@ iptables -A OUTPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -f -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
 iptables -A OUTPUT -p udp --dport 67 -j LOG_AND_DROP
-
+iptables -A OUTPUT -p tcp --dport 0 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --sport 0 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --dport 0 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --sport 0 -j LOG_AND_DROP
 # iptables -A OUTPUT -p tcp --dport 80 -j LOG_AND_REJECT
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
 
@@ -127,7 +136,7 @@ ip6tables -A LOG_AND_DROP -j DROP
 ip6tables -A LOG_AND_REJECT -j LOG --log-prefix "ip6tables reject: " --log-level 7
 ip6tables -A LOG_AND_REJECT -j REJECT --reject-with icmp6-adm-prohibited
 
-V6BLOCKLIST="::/128,::1/128,::ffff:0:0/96,::/96,100::/64,2001:10::/28,2001:10::/28,2001:db8::/32,fc00::/7,fe80::/10,fec0::/10,ff00::/8,2600:1901:0:8813::/128,2002::/24,2002:a00::/24,2002:a00::/24,2002:a9fe::/24,2002:ac10::/28,2002:c000::/40,2002:c000:200::/40,2002:c0a8::/32,2002:c612::/31,2002:c633:6400::/40,2002:cb00:7100::/40,2002:e000::/20,2002:f000::/20,2002:ffff:ffff::/48,2001::/40,2001:0:a00::/40,2001:0:7f00::/40,2001:0:c000::/56,2001:0:ac10::/44,2001:0:a9fe::/48,2001:0:c000:200::/56,2001:0:c0a8::/48,2001:0:c612::/47,2001:0:c633:6400::/56,2001:0:cb00:7100::/56,2001:0:e000::/36,2001:0:f000::/36"
+V6BLOCKLIST="ff00::/8,::/128,::1/128,::ffff:0:0/96,::/96,100::/64,2001:10::/28,2001:10::/28,2001:db8::/32,fc00::/7,fe80::/10,fec0::/10,2600:1901:0:8813::/128,2002::/24,2002:a00::/24,2002:a00::/24,2002:a9fe::/24,2002:ac10::/28,2002:c000::/40,2002:c000:200::/40,2002:c0a8::/32,2002:c612::/31,2002:c633:6400::/40,2002:cb00:7100::/40,2002:e000::/20,2002:f000::/20,2002:ffff:ffff::/48,2001::/40,2001:0:a00::/40,2001:0:7f00::/40,2001:0:c000::/56,2001:0:ac10::/44,2001:0:a9fe::/48,2001:0:c000:200::/56,2001:0:c0a8::/48,2001:0:c612::/47,2001:0:c633:6400::/56,2001:0:cb00:7100::/56,2001:0:e000::/36,2001:0:f000::/36"
 
 
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
@@ -139,7 +148,7 @@ ip6tables -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
 ip6tables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
 -m state --state NEW -j REJECT --reject-with tcp-reset
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
---log-prefix "New not syn: "
+--log-prefix "Drop new not syn: "
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
@@ -168,6 +177,10 @@ ip6tables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJEC
 ip6tables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp6-adm-prohibited
 ip6tables -A INPUT -p dccp -j LOG_AND_REJECT
 ip6tables -A INPUT -p sctp -j LOG_AND_REJECT
+ip6tables -A INPUT -p udp --sport 0 -j LOG_AND_REJECT
+ip6tables -A INPUT -p udp --dport 0 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --sport 0 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --dport 0 -j LOG_AND_REJECT
 ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
@@ -175,6 +188,10 @@ ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
 ip6tables -A OUTPUT -m ipv6header --header frag --soft -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 547 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --dport 0 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --sport 0 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --dport 0 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --sport 0 -j LOG_AND_DROP
 # ip6tables -A OUTPUT -p tcp --dport 80 -j LOG_AND_DROP
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
 
