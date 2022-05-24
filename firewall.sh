@@ -55,8 +55,8 @@ iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 # iptables -A INPUT -s 192.168.0.0/16 -j LOG_AND_REJECT
 # iptables -A OUTPUT -s 192.168.0.0/16 -j LOG_AND_DROP
 
-BLOCKLIST="0.0.0.0/8,10.0.0.0/8,100.64.0.0/10,127.0.53.53,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,240.0.0.0/4,255.255.255.255/32,35.190.56.182/32"
-
+BLOCKLIST="0.0.0.0/8,100.64.0.0/10,127.0.53.53,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,240.0.0.0/4,255.255.255.255/32,35.190.56.182/32"
+# 10.0.0.0/8
 
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
@@ -183,6 +183,7 @@ ip6tables -A INPUT -p tcp --match multiport --sport 0:21 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_REJECT
 ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ff02::2 
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
