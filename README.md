@@ -1,5 +1,5 @@
 # firewall
-System wall
+System wall for self defence
  
 Disable ufw or other preinstalled firewall and run script from root
 
