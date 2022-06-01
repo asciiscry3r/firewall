@@ -107,7 +107,7 @@ iptables -A INPUT -s 127.0.0.1 -p ICMP -j LOG_AND_DROP
 iptables -A INPUT -s 127.0.0.1 -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -s 127.0.0.1 -p TCP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -s 127.0.0.1 -p UDP --sport 2222 -j LOG_AND_DROP
-iptables -A INPUT -s 127.0.0.1 -p TCP --sport 53 -j LOG_AND_DROP
+iptables -A INPUT -s 127.0.0.1 -p TCP --sport 2222 -j LOG_AND_DROP
 iptables -A INPUT -p tcp --dport 16992 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --dport 664 -j LOG_AND_REJECT
 iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
