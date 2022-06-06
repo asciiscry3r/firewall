@@ -225,6 +225,7 @@ ip6tables -A INPUT -p tcp --dport 16995 -j LOG_AND_REJECT
 #ip6tables -A INPUT -p tcp --sport 16996 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --dport 16996 -j LOG_AND_REJECT
 #ip6tables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --dport 664 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ff02::2 
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
@@ -271,7 +272,6 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 # iptables -t mangle -P OUTPUT ACCEPT
 # iptables -t mangle -P FORWARD ACCEPT
 
-
 # ip6tables -t nat -P PREROUTING ACCEPT
 # ip6tables -t nat -P POSTROUTING ACCEPT
 # ip6tables -t nat -P OUTPUT ACCEPT
@@ -295,4 +295,4 @@ systemctl enable ip6tables
 systemctl start ip6tables
 systemctl restart ip6tables
 
-#systemctl restart opensnitchd
+# systemctl restart opensnitchd
