@@ -102,22 +102,16 @@ iptables -A INPUT -p udp --match multiport --sport 0:21 -j LOG_AND_REJECT
 iptables -A INPUT -p udp --match multiport --dport 0:21 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --match multiport --sport 0:21 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_REJECT
+iptables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
+iptables -A INPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
+iptables -A INPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
 iptables -A INPUT -s 127.0.0.1 -p ICMP -j LOG_AND_DROP
 iptables -A INPUT -s 127.0.0.1 -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -s 127.0.0.1 -p TCP --sport 53 -j LOG_AND_DROP
-#iptables -A INPUT -p tcp --sport 16992 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --dport 16992 -j LOG_AND_REJECT
-#iptables -A INPUT -p tcp --sport 16993 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --dport 16993 -j LOG_AND_REJECT
-#iptables -A INPUT -p tcp --sport 16994 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --dport 16994 -j LOG_AND_REJECT
-#iptables -A INPUT -p tcp --sport 16995 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --dport 16995 -j LOG_AND_REJECT
-#iptables -A INPUT -p tcp --sport 16996 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --dport 16996 -j LOG_AND_REJECT
-#iptables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --dport 664 -j LOG_AND_REJECT
 iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
@@ -128,21 +122,15 @@ iptables -A OUTPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --sport 0:21 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --match multiport --dport 0:21 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --match multiport --sport 0:21 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --dport 664 -j LOG_AND_REJECT
+iptables -A OUTPUT -p tcp --sport 664 -j LOG_AND_REJECT
+iptables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
+iptables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
+iptables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
+iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 iptables -A OUTPUT -s 127.0.0.1 -p ICMP -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.1 -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.1 -p TCP --sport 53 -j LOG_AND_DROP
-iptables -A OUTPUT -p tcp --sport 16992 -j LOG_AND_REJECT
-#iptables -A OUTPUT -p tcp --dport 16992 -j LOG_AND_REJECT
-iptables -A OUTPUT -p tcp --sport 16993 -j LOG_AND_REJECT
-#iptables -A OUTPUT -p tcp --dport 16993 -j LOG_AND_REJECT
-iptables -A OUTPUT -p tcp --sport 16994 -j LOG_AND_REJECT
-#iptables -A OUTPUT -p tcp --dport 16994 -j LOG_AND_REJECT
-iptables -A OUTPUT -p tcp --sport 16995 -j LOG_AND_REJECT
-#iptables -A OUTPUT -p tcp --dport 16995 -j LOG_AND_REJECT
-iptables -A OUTPUT -p tcp --sport 16996 -j LOG_AND_REJECT
-#iptables -A OUTPUT -p tcp --dport 16996 -j LOG_AND_REJECT
-iptables -A OUTPUT -p tcp --sport 664 -j LOG_AND_REJECT
-#iptables -A OUTPUT -p tcp --dport 664 -j LOG_AND_REJECT
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
 
 iptables -t raw -I PREROUTING -m rpfilter --invert -j DROP
@@ -214,18 +202,12 @@ ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 ip6tables -A INPUT -s ::1 -p ICMP -j LOG_AND_DROP
 ip6tables -A INPUT -s ::1 -p UDP --sport 53 -j LOG_AND_DROP
 ip6tables -A INPUT -s ::1 -p TCP --sport 53 -j LOG_AND_DROP
-#ip6tables -A INPUT -p tcp --sport 16992 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --dport 16992 -j LOG_AND_REJECT
-#ip6tables -A INPUT -p tcp --sport 16993 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --dport 16993 -j LOG_AND_REJECT
-#ip6tables -A INPUT -p tcp --sport 16994 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --dport 16994 -j LOG_AND_REJECT
-#ip6tables -A INPUT -p tcp --sport 16995 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --dport 16995 -j LOG_AND_REJECT
-#ip6tables -A INPUT -p tcp --sport 16996 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --dport 16996 -j LOG_AND_REJECT
-#ip6tables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --dport 664 -j LOG_AND_REJECT
+ip6tables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
+ip6tables -A INPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
+ip6tables -A INPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ff02::2 
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
@@ -237,21 +219,15 @@ ip6tables -A OUTPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --sport 0:21 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --dport 0:21 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --sport 0:21 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --dport 664 -j LOG_AND_REJECT
+ip6tables -A OUTPUT -p tcp --sport 664 -j LOG_AND_REJECT
+ip6tables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
+ip6tables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
+ip6tables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
+ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s ::1 -p ICMP -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1 -p UDP --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1 -p TCP --sport 53 -j LOG_AND_DROP
-iptables -A OUTPUT -p tcp --sport 16992 -j LOG_AND_REJECT
-#ip6tables -A OUTPUT -p tcp --dport 16992 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -p tcp --sport 16993 -j LOG_AND_REJECT
-#ip6tables -A OUTPUT -p tcp --dport 16993 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -p tcp --sport 16994 -j LOG_AND_REJECT
-#ip6tables -A OUTPUT -p tcp --dport 16994 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -p tcp --sport 16995 -j LOG_AND_REJECT
-#ip6tables -A OUTPUT -p tcp --dport 16995 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -p tcp --sport 16996 -j LOG_AND_REJECT
-#ip6tables -A OUTPUT -p tcp --dport 16996 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -p tcp --sport 664 -j LOG_AND_REJECT
-#ip6tables -A OUTPUT -p tcp --dport 664 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
 
 ip6tables -t raw -I PREROUTING -m rpfilter --invert -j DROP
