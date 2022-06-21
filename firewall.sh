@@ -6,16 +6,19 @@
 # https://ipgeolocation.io/resources/bogon.html
 
 iptables -F
+iptables -t raw -F
 iptables -t nat -F
 iptables -t mangle -F
 #
 # erase all chains that's not default in filter and nat table.
 #
 iptables -X
+iptables -t raw -X
 iptables -t nat -X
 iptables -t mangle -X
 
 ip6tables -F
+ip6tables -t raw -F
 ip6tables -t nat -F
 ip6tables -t mangle -F
 
@@ -24,6 +27,7 @@ ip6tables -t mangle -F
 #
 
 ip6tables -X
+ip6tables -t raw -X
 ip6tables -t nat -X
 ip6tables -t mangle -X
 
@@ -118,10 +122,10 @@ iptables -A OUTPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -f -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
 iptables -A OUTPUT -p udp --dport 67 -j LOG_AND_DROP
-iptables -A OUTPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_DROP
-iptables -A OUTPUT -p tcp --match multiport --sport 0:21 -j LOG_AND_DROP
-iptables -A OUTPUT -p udp --match multiport --dport 0:21 -j LOG_AND_DROP
-iptables -A OUTPUT -p udp --match multiport --sport 0:21 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --match multiport --dport 0:50 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --match multiport --sport 0:50 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 664 -j LOG_AND_REJECT
 iptables -A OUTPUT -p tcp --sport 664 -j LOG_AND_REJECT
 iptables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
@@ -131,6 +135,7 @@ iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJEC
 iptables -A OUTPUT -s 127.0.0.1 -p ICMP -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.1 -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.1 -p TCP --sport 53 -j LOG_AND_DROP
+# iptables -t raw -I OUTPUT -j DROP :)
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
 
 iptables -t raw -I PREROUTING -m rpfilter --invert -j DROP
@@ -215,10 +220,10 @@ ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
 ip6tables -A OUTPUT -m ipv6header --header frag --soft -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 547 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p tcp --match multiport --sport 0:21 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --match multiport --dport 0:21 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --match multiport --sport 0:21 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --match multiport --dport 0:50 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --match multiport --sport 0:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 664 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -p tcp --sport 664 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
@@ -228,6 +233,7 @@ ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJE
 ip6tables -A OUTPUT -s ::1 -p ICMP -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1 -p UDP --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1 -p TCP --sport 53 -j LOG_AND_DROP
+ip6tables -t raw -I OUTPUT -j DROP # :)
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
 
 ip6tables -t raw -I PREROUTING -m rpfilter --invert -j DROP
@@ -271,4 +277,4 @@ systemctl enable ip6tables
 systemctl start ip6tables
 systemctl restart ip6tables
 
-#systemctl restart opensnitchd
+systemctl restart opensnitchd
