@@ -37,8 +37,8 @@ ip6tables -t mangle -X
 
 ip -s neighbour flush all
 # arptables --flush
-# arptables -A INPUT --source-mac 98:DA:C4:BF:99:A5 -j ACCEPT
-# arptables -A INPUT --source-mac 84:D8:1B:8A:31:73 -j ACCEPT
+# arptables -A INPUT --source-mac ${yourmac1} -j ACCEPT
+# arptables -A INPUT --source-mac ${yourmac2} -j ACCEPT
 
 #
 # AAAA
