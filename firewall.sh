@@ -32,6 +32,15 @@ ip6tables -t nat -X
 ip6tables -t mangle -X
 
 #
+# ARP
+#
+
+ip -s neighbour flush all
+# arptables --flush
+# arptables -A INPUT --source-mac 98:DA:C4:BF:99:A5 -j ACCEPT
+# arptables -A INPUT --source-mac 84:D8:1B:8A:31:73 -j ACCEPT
+
+#
 # AAAA
 #
 
@@ -51,16 +60,10 @@ iptables -A LOG_AND_REJECT -j LOG --log-prefix "iptables reject: " --log-level 7
 iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 
 # Comment this and rerun script for get access to most networks provided by vpn services
-# iptables -A INPUT -s 10.0.0.0/8 -j LOG_AND_REJECT
-# iptables -A OUTPUT -s 10.0.0.0/8 -j LOG_AND_DROP
-# #####################################################################################
-# iptables -A INPUT -s 127.0.0.1/8 -j LOG_AND_REJECT
-# iptables -A OUTPUT -s 127.0.0.1/8 -j LOG_AND_DROP
-# iptables -A INPUT -s 192.168.0.0/16 -j LOG_AND_REJECT
-# iptables -A OUTPUT -s 192.168.0.0/16 -j LOG_AND_DROP
+# 10.0.0.0/8
 
 BLOCKLIST="0.0.0.0/8,10.0.0.0/8,100.64.0.0/10,127.0.53.53,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,240.0.0.0/4,255.255.255.255/32,35.190.56.182/32"
-# 10.0.0.0/8
+
 
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
@@ -102,10 +105,10 @@ iptables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT
 iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachable
 iptables -A INPUT -p dccp -j LOG_AND_REJECT
 iptables -A INPUT -p sctp -j LOG_AND_REJECT
-iptables -A INPUT -p udp --match multiport --sport 0:21 -j LOG_AND_REJECT
-iptables -A INPUT -p udp --match multiport --dport 0:21 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --match multiport --sport 0:21 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_REJECT
+iptables -A INPUT -p udp --match multiport --sport 0:50 -j LOG_AND_REJECT
+iptables -A INPUT -p udp --match multiport --dport 0:50 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_REJECT
 iptables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
 iptables -A INPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
@@ -137,6 +140,9 @@ iptables -A OUTPUT -s 127.0.0.1 -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.1 -p TCP --sport 53 -j LOG_AND_DROP
 # iptables -t raw -I OUTPUT -j DROP :)
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
+# iptables -A OUTPUT ! -p icmp -j DROP
+# iptables -A OUTPUT ! -p tcp -j DROP
+# iptables -A OUTPUT ! -p udp -j DROP
 
 iptables -t raw -I PREROUTING -m rpfilter --invert -j DROP
 iptables -A INPUT -j LOG_AND_REJECT
@@ -199,10 +205,10 @@ ip6tables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJEC
 ip6tables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp6-adm-prohibited
 ip6tables -A INPUT -p dccp -j LOG_AND_REJECT
 ip6tables -A INPUT -p sctp -j LOG_AND_REJECT
-ip6tables -A INPUT -p udp --match multiport --sport 0:21 -j LOG_AND_REJECT
-ip6tables -A INPUT -p udp --match multiport --dport 0:21 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --match multiport --sport 0:21 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_REJECT
+ip6tables -A INPUT -p udp --match multiport --sport 0:50 -j LOG_AND_REJECT
+ip6tables -A INPUT -p udp --match multiport --dport 0:50 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 ip6tables -A INPUT -s ::1 -p ICMP -j LOG_AND_DROP
 ip6tables -A INPUT -s ::1 -p UDP --sport 53 -j LOG_AND_DROP
@@ -244,6 +250,7 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 # NAT and Mangle #
 ##################
 
+# The "nat" table is not intended for filtering, the use of DROP is therefore inhibited.
 # iptables -t nat -P PREROUTING ACCEPT
 # iptables -t nat -P POSTROUTING ACCEPT
 # iptables -t nat -P OUTPUT ACCEPT
@@ -254,6 +261,7 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 # iptables -t mangle -P OUTPUT ACCEPT
 # iptables -t mangle -P FORWARD ACCEPT
 
+# The "nat" table is not intended for filtering, the use of DROP is therefore inhibited.
 # ip6tables -t nat -P PREROUTING ACCEPT
 # ip6tables -t nat -P POSTROUTING ACCEPT
 # ip6tables -t nat -P OUTPUT ACCEPT
