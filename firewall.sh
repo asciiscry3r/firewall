@@ -62,7 +62,7 @@ iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 # Comment this and rerun script for get access to most networks provided by vpn services
 # 10.0.0.0/8
 
-BLOCKLIST="0.0.0.0/8,10.0.0.0/8,100.64.0.0/10,127.0.53.53,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,240.0.0.0/4,255.255.255.255/32,35.190.56.182/32"
+BLOCKLIST="0.0.0.0/8,100.64.0.0/10,127.0.53.53,169.254.0.0/16,192.0.0.0/24,192.0.2.0/24,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,240.0.0.0/4,255.255.255.255/32,35.190.56.182/32"
 
 
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
@@ -79,7 +79,7 @@ iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A INPUT -i lo -s 127.0.0.1 -j ACCEPT
-iptables -A INPUT ! -p icmp -j DROP
+iptables -A INPUT -p icmp -j DROP
 iptables -A INPUT ! -p tcp -j DROP
 iptables -A INPUT ! -p udp -j DROP
 iptables -A INPUT -p icmp --icmp-type address-mask-request -j LOG_AND_REJECT
@@ -106,9 +106,9 @@ iptables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT
 iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachable
 iptables -A INPUT -p dccp -j LOG_AND_REJECT
 iptables -A INPUT -p sctp -j LOG_AND_REJECT
-iptables -A INPUT -p udp --match multiport --sport 0:50 -j LOG_AND_REJECT
+iptables -A INPUT -p udp --match multiport --sport 0:21 -j LOG_AND_REJECT
 iptables -A INPUT -p udp --match multiport --dport 0:50 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --match multiport --sport 0:21 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_REJECT
 iptables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
@@ -117,18 +117,20 @@ iptables -A INPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
-iptables -A INPUT -s 127.0.0.1 -p ICMP -j LOG_AND_DROP
-iptables -A INPUT -s 127.0.0.1 -p UDP --sport 53 -j LOG_AND_DROP
-iptables -A INPUT -s 127.0.0.1 -p TCP --sport 53 -j LOG_AND_DROP
+#iptables -A INPUT -s 127.0.0.1 -p ICMP -j LOG_AND_DROP
+iptables -A INPUT -i lo -s 127.0.0.0/8 -p UDP --sport 53 -j LOG_AND_DROP
+iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP --sport 53 -j LOG_AND_DROP
+iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
+iptables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
 iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -f -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
 iptables -A OUTPUT -p udp --dport 67 -j LOG_AND_DROP
-iptables -A OUTPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_DROP
-iptables -A OUTPUT -p udp --match multiport --dport 0:50 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --match multiport --dport 0:21 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --match multiport --sport 0:50 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 664 -j LOG_AND_REJECT
 iptables -A OUTPUT -p tcp --sport 664 -j LOG_AND_REJECT
@@ -136,9 +138,9 @@ iptables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJEC
 iptables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 iptables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
 iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 127.0.0.1 -p ICMP -j LOG_AND_DROP
-iptables -A OUTPUT -s 127.0.0.1 -p UDP --sport 53 -j LOG_AND_DROP
-iptables -A OUTPUT -s 127.0.0.1 -p TCP --sport 53 -j LOG_AND_DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j LOG_AND_DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -p UDP --sport 53 -j LOG_AND_DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j LOG_AND_DROP
 # iptables -t raw -I OUTPUT -j DROP :)
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
 # iptables -A OUTPUT ! -p icmp -j DROP
@@ -187,7 +189,7 @@ ip6tables -A INPUT -p ipv6-icmp --icmpv6-type packet-too-big -j LOG_AND_REJECT
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type time-exceeded -j LOG_AND_REJECT
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type parameter-problem -j LOG_AND_REJECT
 ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
-ip6tables -A INPUT ! -p icmp -j DROP
+ip6tables -A INPUT -p icmp -j DROP
 ip6tables -A INPUT ! -p tcp -j DROP
 ip6tables -A INPUT ! -p udp -j DROP
 # ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
@@ -212,15 +214,17 @@ ip6tables -A INPUT -p udp --match multiport --dport 0:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
-ip6tables -A INPUT -s ::1 -p ICMP -j LOG_AND_DROP
-ip6tables -A INPUT -s ::1 -p UDP --sport 53 -j LOG_AND_DROP
-ip6tables -A INPUT -s ::1 -p TCP --sport 53 -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/128 -p UDP --sport 53 -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/128 -p TCP --sport 53 -j LOG_AND_DROP
 ip6tables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
 ip6tables -A INPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A INPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
+ip6tables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
+ip6tables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ff02::2 
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
@@ -238,10 +242,10 @@ ip6tables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJE
 ip6tables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -s ::1 -p ICMP -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1 -p UDP --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1 -p TCP --sport 53 -j LOG_AND_DROP
-ip6tables -t raw -I OUTPUT -j DROP # :)
+ip6tables -A OUTPUT -s ::1/128 -p ICMP -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/128 -p UDP --sport 53 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j LOG_AND_DROP
+#ip6tables -t raw -I OUTPUT -j DROP # :)
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
 
 ip6tables -t raw -I PREROUTING -m rpfilter --invert -j DROP
