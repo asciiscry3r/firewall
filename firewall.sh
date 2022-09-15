@@ -82,10 +82,10 @@ iptables -A INPUT -i lo -s 127.0.0.1 -j ACCEPT
 iptables -A INPUT -p icmp -j DROP
 iptables -A INPUT ! -p tcp -j DROP
 iptables -A INPUT ! -p udp -j DROP
-iptables -A INPUT -p icmp --icmp-type address-mask-request -j LOG_AND_REJECT
-iptables -A INPUT -p icmp --icmp-type timestamp-request -j LOG_AND_REJECT
-iptables -A INPUT -p icmp --icmp-type router-solicitation -j LOG_AND_REJECT
-iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
+# iptables -A INPUT -p icmp --icmp-type address-mask-request -j LOG_AND_REJECT
+# iptables -A INPUT -p icmp --icmp-type timestamp-request -j LOG_AND_REJECT
+# iptables -A INPUT -p icmp --icmp-type router-solicitation -j LOG_AND_REJECT
+# iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
 # iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
 # SSH  # Uncomment if you need ssh connection to machine 
 # iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
@@ -117,7 +117,7 @@ iptables -A INPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
-#iptables -A INPUT -s 127.0.0.1 -p ICMP -j LOG_AND_DROP
+# iptables -A INPUT -s 127.0.0.1 -p ICMP -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
@@ -184,11 +184,11 @@ ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 ip6tables -A INPUT -i lo -s ::1 -j ACCEPT
-ip6tables -A INPUT -p ipv6-icmp --icmpv6-type destination-unreachable -j LOG_AND_REJECT
-ip6tables -A INPUT -p ipv6-icmp --icmpv6-type packet-too-big -j LOG_AND_REJECT
-ip6tables -A INPUT -p ipv6-icmp --icmpv6-type time-exceeded -j LOG_AND_REJECT
-ip6tables -A INPUT -p ipv6-icmp --icmpv6-type parameter-problem -j LOG_AND_REJECT
-ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
+# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type destination-unreachable -j LOG_AND_REJECT
+# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type packet-too-big -j LOG_AND_REJECT
+# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type time-exceeded -j LOG_AND_REJECT
+# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type parameter-problem -j LOG_AND_REJECT
+# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
 ip6tables -A INPUT -p icmp -j DROP
 ip6tables -A INPUT ! -p tcp -j DROP
 ip6tables -A INPUT ! -p udp -j DROP
@@ -226,7 +226,7 @@ ip6tables -A INPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJEC
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
 ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ff02::2 
+# ip6tables -A OUTPUT -s ff02::2 
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
@@ -245,7 +245,7 @@ ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJE
 ip6tables -A OUTPUT -s ::1/128 -p ICMP -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/128 -p UDP --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j LOG_AND_DROP
-#ip6tables -t raw -I OUTPUT -j DROP # :)
+# ip6tables -t raw -I OUTPUT -j DROP # :)
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
 
 ip6tables -t raw -I PREROUTING -m rpfilter --invert -j DROP
