@@ -9,9 +9,11 @@ iptables -F
 iptables -t raw -F
 iptables -t nat -F
 iptables -t mangle -F
+
 #
 # erase all chains that's not default in filter and nat table.
 #
+
 iptables -X
 iptables -t raw -X
 iptables -t nat -X
@@ -40,9 +42,8 @@ ip -s neighbour flush all
 # arptables -A INPUT --source-mac ${yourmac1} -j ACCEPT
 # arptables -A INPUT --source-mac ${yourmac2} -j ACCEPT
 
-#
-# AAAA
-#
+
+########## Ipv4 ######################################################
 
 iptables -N TCP
 iptables -N UDP
@@ -54,9 +55,9 @@ iptables -P FORWARD DROP
 iptables -P OUTPUT ACCEPT
 iptables -P INPUT DROP
 
-iptables -A LOG_AND_DROP -j LOG --log-prefix "iptables deny: " --log-level 7
+iptables -A LOG_AND_DROP -j LOG --log-prefix "Iptables: v4Deny: " --log-level 7
 iptables -A LOG_AND_DROP -j DROP
-iptables -A LOG_AND_REJECT -j LOG --log-prefix "iptables reject: " --log-level 7
+iptables -A LOG_AND_REJECT -j LOG --log-prefix "Iptables: v4Reject: " --log-level 7
 iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 
 # Comment this and rerun script for get access to most networks provided by vpn services
@@ -69,12 +70,12 @@ BLOCKLIST="0.0.0.0/8,100.64.0.0/10,127.0.53.53,169.254.0.0/16,192.0.0.0/24,192.0
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
 # bad_tcp_packets chain
 iptables -A bad_tcp_packets -p tcp -m length --length 20 -j LOG \
---log-prefix "Empty packets: "
+--log-prefix "Iptables: Empty packets: "
 iptables -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
 iptables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
 -m state --state NEW -j REJECT --reject-with tcp-reset
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
---log-prefix "Drop new not syn: "
+--log-prefix "Iptables: Drop new not syn: "
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
@@ -82,18 +83,20 @@ iptables -A INPUT -i lo -s 127.0.0.1 -j ACCEPT
 iptables -A INPUT -p icmp -j DROP
 iptables -A INPUT ! -p tcp -j DROP
 iptables -A INPUT ! -p udp -j DROP
-iptables -A INPUT -p icmp --icmp-type address-mask-request -j LOG_AND_REJECT
-iptables -A INPUT -p icmp --icmp-type timestamp-request -j LOG_AND_REJECT
-iptables -A INPUT -p icmp --icmp-type router-solicitation -j LOG_AND_REJECT
-iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
+# iptables -A INPUT -p icmp --icmp-type address-mask-request -j LOG_AND_REJECT
+# iptables -A INPUT -p icmp --icmp-type timestamp-request -j LOG_AND_REJECT
+# iptables -A INPUT -p icmp --icmp-type router-solicitation -j LOG_AND_REJECT
+# iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
 # iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
 # SSH  # Uncomment if you need ssh connection to machine 
 # iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
 # iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 3 --seconds 10 -j LOG_AND_REJECT
 # iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 4 --seconds 1800 -j LOG_AND_REJECT
 # iptables -A IN_SSH -m recent --name sshbf --set -j ACCEPT
+# TBD MORE EXPLOITS ##################################################
 iptables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
 iptables -A INPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
+# ####################################################################
 iptables -A INPUT -f -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --tcp-flags ALL NONE -j LOG_AND_REJECT
@@ -117,11 +120,17 @@ iptables -A INPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
-#iptables -A INPUT -s 127.0.0.1 -p ICMP -j LOG_AND_DROP
-iptables -A INPUT -i lo -s 127.0.0.0/8 -p UDP --sport 53 -j LOG_AND_DROP
-iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP --sport 53 -j LOG_AND_DROP
+# Possible ME comm and other strange staf used by piracy and hackers #
+iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
+iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p UDP --sport 53 -j LOG_AND_DROP
+iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p TCP --sport 53 -j LOG_AND_DROP
+iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -j DROP
+iptables -A INPUT -i lo -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
+iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
+# TBD MORE EXPLOITS ##################################################
 iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
 iptables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
+# ####################################################################
 iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
@@ -134,15 +143,20 @@ iptables -A OUTPUT -p udp --match multiport --dport 0:21 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --match multiport --sport 0:50 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 664 -j LOG_AND_REJECT
 iptables -A OUTPUT -p tcp --sport 664 -j LOG_AND_REJECT
-iptables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
-iptables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
-iptables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
-iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
-iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j LOG_AND_DROP
-iptables -A OUTPUT -s 127.0.0.0/8 -p UDP --sport 53 -j LOG_AND_DROP
-iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
+# Possible ME comm and other strange staf used by piracy and hackers #
+iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -p UDP -m limit --sport 53 -j LOG_AND_DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -p TCP -m limit --sport 53 -j LOG_AND_DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
+# ####################################################################
 # iptables -t raw -I OUTPUT -j DROP :)
-iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
+iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 # iptables -A OUTPUT ! -p icmp -j DROP
 # iptables -A OUTPUT ! -p tcp -j DROP
 # iptables -A OUTPUT ! -p udp -j DROP
@@ -150,7 +164,7 @@ iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level 
 iptables -t raw -I PREROUTING -m rpfilter --invert -j DROP
 iptables -A INPUT -j LOG_AND_REJECT
 
-########## Ipv6
+########## Ipv6 ######################################################
 
 ip6tables -N TCP
 ip6tables -N UDP
@@ -162,9 +176,9 @@ ip6tables -P FORWARD DROP
 ip6tables -P OUTPUT ACCEPT
 ip6tables -P INPUT DROP
 
-ip6tables -A LOG_AND_DROP -j LOG --log-prefix "ip6tables deny: " --log-level 7
+ip6tables -A LOG_AND_DROP -j LOG --log-prefix "Iptables: v6Deny: " --log-level 7
 ip6tables -A LOG_AND_DROP -j DROP
-ip6tables -A LOG_AND_REJECT -j LOG --log-prefix "ip6tables reject: " --log-level 7
+ip6tables -A LOG_AND_REJECT -j LOG --log-prefix "Iptables: v6Reject: " --log-level 7
 ip6tables -A LOG_AND_REJECT -j REJECT --reject-with icmp6-adm-prohibited
 
 V6BLOCKLIST="ff00::/8,::/128,::1/128,::ffff:0:0/96,::/96,100::/64,2001:10::/28,2001:10::/28,2001:db8::/32,fc00::/7,fe80::/10,fec0::/10,2600:1901:0:8813::/128,2002::/24,2002:a00::/24,2002:a00::/24,2002:a9fe::/24,2002:ac10::/28,2002:c000::/40,2002:c000:200::/40,2002:c0a8::/32,2002:c612::/31,2002:c633:6400::/40,2002:cb00:7100::/40,2002:e000::/20,2002:f000::/20,2002:ffff:ffff::/48,2001::/40,2001:0:a00::/40,2001:0:7f00::/40,2001:0:c000::/56,2001:0:ac10::/44,2001:0:a9fe::/48,2001:0:c000:200::/56,2001:0:c0a8::/48,2001:0:c612::/47,2001:0:c633:6400::/56,2001:0:cb00:7100::/56,2001:0:e000::/36,2001:0:f000::/36"
@@ -174,29 +188,30 @@ V6BLOCKLIST="ff00::/8,::/128,::1/128,::ffff:0:0/96,::/96,100::/64,2001:10::/28,2
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
 # bad_tcp_packets chain
 ip6tables -A bad_tcp_packets -p tcp -m length --length 20 -j LOG \
---log-prefix "Empty packets: "
+--log-prefix "Iptables: Empty packets: "
 ip6tables -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
 ip6tables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
 -m state --state NEW -j REJECT --reject-with tcp-reset
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
---log-prefix "Drop new not syn: "
+--log-prefix "Iptables: Drop new not syn: "
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 ip6tables -A INPUT -i lo -s ::1 -j ACCEPT
-ip6tables -A INPUT -p ipv6-icmp --icmpv6-type destination-unreachable -j LOG_AND_REJECT
-ip6tables -A INPUT -p ipv6-icmp --icmpv6-type packet-too-big -j LOG_AND_REJECT
-ip6tables -A INPUT -p ipv6-icmp --icmpv6-type time-exceeded -j LOG_AND_REJECT
-ip6tables -A INPUT -p ipv6-icmp --icmpv6-type parameter-problem -j LOG_AND_REJECT
-ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
+# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type destination-unreachable -j LOG_AND_REJECT
+# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type packet-too-big -j LOG_AND_REJECT
+# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type time-exceeded -j LOG_AND_REJECT
+# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type parameter-problem -j LOG_AND_REJECT
+# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
 ip6tables -A INPUT -p icmp -j DROP
 ip6tables -A INPUT ! -p tcp -j DROP
 ip6tables -A INPUT ! -p udp -j DROP
-# ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 # ip6tables -A INPUT -s fe80::/10 -p ipv6-icmp -j ACCEPT
 # ip6tables -A INPUT -p udp --sport 547 --dport 546 -j ACCEPT
+# TBD MORE EXPLOITS ###################################################
 ip6tables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
 ip6tables -A INPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
+# #####################################################################
 ip6tables -A INPUT -m ipv6header --header frag --soft -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --tcp-flags ALL NONE -j LOG_AND_REJECT
@@ -214,19 +229,26 @@ ip6tables -A INPUT -p udp --match multiport --dport 0:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
-ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p UDP --sport 53 -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p TCP --sport 53 -j LOG_AND_DROP
+# Possible ME comm and other strange staf used by piracy and hackers #
+ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -j DROP
+ip6tables -A INPUT -i lo -s ::1/128 -p UDP --sport 53 -j DROP
+ip6tables -A INPUT -i lo -s ::1/128 -p TCP --sport 53 -j DROP
+# ####################################################################
 ip6tables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
 ip6tables -A INPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A INPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
-ip6tables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
+# TBD MORE EXPLOITS ##################################################
+ip6tables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
+ip6tables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP
+# ####################################################################
 ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ff02::2 
+# ip6tables -A OUTPUT -s ff02::2 
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
@@ -236,17 +258,22 @@ ip6tables -A OUTPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --dport 0:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --sport 0:50 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --dport 664 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -p tcp --sport 664 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
-ip6tables -A OUTPUT -s ::1/128 -p ICMP -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/128 -p UDP --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j LOG_AND_DROP
-#ip6tables -t raw -I OUTPUT -j DROP # :)
-ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "IPT OUTPUT packet died: "
+ip6tables -A OUTPUT -p udp --dport 664 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --sport 664 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
+# Possible ME comm and other strange staf used by piracy and hackers #
+ip6tables -A OUTPUT -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/128 -p ICMP -j DROP
+ip6tables -A OUTPUT -s ::1/128 -p UDP --sport 53 -j DROP
+ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j DROP
+# ####################################################################
+# ip6tables -t raw -I OUTPUT -j DROP # :)
+ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 
 ip6tables -t raw -I PREROUTING -m rpfilter --invert -j DROP
 ip6tables -A INPUT -j LOG_AND_REJECT
@@ -291,4 +318,6 @@ systemctl enable ip6tables
 systemctl start ip6tables
 systemctl restart ip6tables
 
-systemctl restart opensnitchd
+if [ -f /usr/lib/systemd/system/opensnitchd.service ]; then
+    systemctl restart opensnitchd
+fi
