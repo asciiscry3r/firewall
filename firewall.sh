@@ -310,9 +310,9 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 
 #################
 
-release=grep -e '^ID=' /etc/os-release |  cut -c 4-
+release=`grep -e '^ID=' /etc/os-release |  cut -c 4-`
 
-if [ $release == 'arch'  ]; then
+if [[ $release == 'arch' ]]; then
     iptables-save > /etc/iptables/iptables.rules
     ip6tables-save > /etc/iptables/ip6tables.rules
 
@@ -323,7 +323,7 @@ if [ $release == 'arch'  ]; then
     systemctl enable ip6tables
     systemctl start ip6tables
     systemctl restart ip6tables
-elif [ $release == 'raspbian' ]; then
+elif [[ $release == 'raspbian' ]]; then
     iptables-save > /etc/iptables/rules.v4
     ip6tables-save > /etc/iptables/rules.v4
 
