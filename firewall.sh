@@ -61,9 +61,9 @@ iptables -A LOG_AND_REJECT -j LOG --log-prefix "Iptables: v4Reject: " --log-leve
 iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 
 
-iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 3 --seconds 10 -j LOG_AND_REJECT
-iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 4 --seconds 1800 -j LOG_AND_REJECT
-iptables -A IN_SSH -m recent --name sshbf --set -j ACCEPT
+# iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 3 --seconds 10 -j LOG_AND_REJECT
+# iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 4 --seconds 1800 -j LOG_AND_REJECT
+# iptables -A IN_SSH -m recent --name sshbf --set -j ACCEPT
 
 
 # Comment this and rerun script for get access to most networks provided by vpn services
