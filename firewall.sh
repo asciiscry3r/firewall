@@ -95,7 +95,7 @@ iptables -A INPUT ! -p udp -j DROP
 # iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
 # iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
 # SSH  # Uncomment if you need ssh connection to machine 
-iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
+# iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
 # TBD MORE EXPLOITS ##################################################
 iptables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
 iptables -A INPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
