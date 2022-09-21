@@ -75,12 +75,12 @@ BLOCKLIST="0.0.0.0/8,100.64.0.0/10,127.0.53.53,169.254.0.0/16,192.0.0.0/24,192.0
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
 # bad_tcp_packets chain
-iptables -A bad_tcp_packets -p tcp -m length --length 20 -j LOG \
+iptables -A bad_tcp_packets -p tcp -m limit -m length --length 20 -j LOG \
 --log-prefix "Iptables: Empty packets: "
 iptables -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
 iptables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
 -m state --state NEW -j REJECT --reject-with tcp-reset
-iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
+iptables -A bad_tcp_packets -p tcp  -m limit ! --syn -m state --state NEW -j LOG \
 --log-prefix "Iptables: Drop new not syn: "
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
@@ -190,12 +190,12 @@ V6BLOCKLIST="ff00::/8,::/128,::1/128,::ffff:0:0/96,::/96,100::/64,2001:10::/28,2
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
 # bad_tcp_packets chain
-ip6tables -A bad_tcp_packets -p tcp -m length --length 20 -j LOG \
+ip6tables -A bad_tcp_packets -p tcp  -m limit -m length --length 20 -j LOG \
 --log-prefix "Iptables: Empty packets: "
 ip6tables -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
 ip6tables -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
 -m state --state NEW -j REJECT --reject-with tcp-reset
-ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j LOG \
+ip6tables -A bad_tcp_packets -p tcp  -m limit ! --syn -m state --state NEW -j LOG \
 --log-prefix "Iptables: Drop new not syn: "
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
