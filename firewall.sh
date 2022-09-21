@@ -60,6 +60,12 @@ iptables -A LOG_AND_DROP -j DROP
 iptables -A LOG_AND_REJECT -j LOG --log-prefix "Iptables: v4Reject: " --log-level 7
 iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 
+
+iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 3 --seconds 10 -j LOG_AND_REJECT
+iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 4 --seconds 1800 -j LOG_AND_REJECT
+iptables -A IN_SSH -m recent --name sshbf --set -j ACCEPT
+
+
 # Comment this and rerun script for get access to most networks provided by vpn services
 # 10.0.0.0/8
 
@@ -89,10 +95,7 @@ iptables -A INPUT ! -p udp -j DROP
 # iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
 # iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
 # SSH  # Uncomment if you need ssh connection to machine 
-# iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
-# iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 3 --seconds 10 -j LOG_AND_REJECT
-# iptables -A IN_SSH -m recent --name sshbf --rttl --rcheck --hitcount 4 --seconds 1800 -j LOG_AND_REJECT
-# iptables -A IN_SSH -m recent --name sshbf --set -j ACCEPT
+iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
 # TBD MORE EXPLOITS ##################################################
 iptables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
 iptables -A INPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
@@ -307,16 +310,26 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 
 #################
 
-iptables-save > /etc/iptables/iptables.rules
-ip6tables-save > /etc/iptables/ip6tables.rules
+release=grep -e '^ID=' /etc/os-release |  cut -c 4-
 
-systemctl enable iptables
-systemctl start iptables
-systemctl restart iptables
+if [ $release == 'arch'  ]; then
+    iptables-save > /etc/iptables/iptables.rules
+    ip6tables-save > /etc/iptables/ip6tables.rules
 
-systemctl enable ip6tables
-systemctl start ip6tables
-systemctl restart ip6tables
+    systemctl enable iptables
+    systemctl start iptables
+    systemctl restart iptables
+
+    systemctl enable ip6tables
+    systemctl start ip6tables
+    systemctl restart ip6tables
+elif [ $release == 'raspbian' ]; then
+    iptables-save > /etc/iptables/rules.v4
+    ip6tables-save > /etc/iptables/rules.v4
+
+    systemctl enable netfilter-persistent
+    systemctl start netfilter-persistent
+fi
 
 if [ -f /usr/lib/systemd/system/opensnitchd.service ]; then
     systemctl restart opensnitchd
