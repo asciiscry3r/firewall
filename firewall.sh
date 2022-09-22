@@ -37,7 +37,7 @@ ip6tables -t mangle -X
 # ARP
 #
 
-ip -s neighbour flush all
+# ip -s neighbour flush all
 # arptables --flush
 # arptables -A INPUT --source-mac ${yourmac1} -j ACCEPT
 # arptables -A INPUT --source-mac ${yourmac2} -j ACCEPT
@@ -101,9 +101,6 @@ iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT
 iptables -A INPUT -p dccp -j LOG_AND_REJECT
 iptables -A INPUT -p sctp -j LOG_AND_REJECT
 iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
-# Possible ME comm and other strange staf used by piracy and hackers #
-iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
-iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -j DROP
 # TBD MORE EXPLOITS ##################################################
 iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
 iptables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
@@ -113,17 +110,11 @@ iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -f -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
-# Possible ME comm and other strange staf used by piracy and hackers #
-iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
-iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
 # ####################################################################
-# iptables -t raw -I OUTPUT -j DROP :)
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 
 iptables -t raw -I PREROUTING -m rpfilter --invert -j DROP
-
 iptables -A INPUT -p tcp --dport 22 -j ACCEPT
-
 iptables -A INPUT -j LOG_AND_REJECT
 
 ########## Ipv6 ######################################################
@@ -160,11 +151,6 @@ ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 ip6tables -A INPUT -i lo -s ::1 -j ACCEPT
-# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type destination-unreachable -j LOG_AND_REJECT
-# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type packet-too-big -j LOG_AND_REJECT
-# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type time-exceeded -j LOG_AND_REJECT
-# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type parameter-problem -j LOG_AND_REJECT
-# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
 ip6tables -A INPUT -p icmp -j DROP
 ip6tables -A INPUT ! -p tcp -j DROP
 ip6tables -A INPUT ! -p udp -j DROP
@@ -191,20 +177,6 @@ ip6tables -A INPUT -p udp --match multiport --dport 0:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
-# Possible ME comm and other strange staf used by piracy and hackers #
-ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -j DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p UDP --sport 53 -j DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p TCP --sport 53 -j DROP
-# ####################################################################
-ip6tables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
-ip6tables -A INPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
-ip6tables -A INPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 # TBD MORE EXPLOITS ##################################################
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP
@@ -220,21 +192,7 @@ ip6tables -A OUTPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --dport 0:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --sport 0:50 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --dport 664 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p tcp --sport 664 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
-# Possible ME comm and other strange staf used by piracy and hackers #
-ip6tables -A OUTPUT -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/128 -p ICMP -j DROP
-ip6tables -A OUTPUT -s ::1/128 -p UDP --sport 53 -j DROP
-ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j DROP
 # ####################################################################
-# ip6tables -t raw -I OUTPUT -j DROP # :)
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 
 ip6tables -t raw -I PREROUTING -m rpfilter --invert -j DROP
@@ -269,9 +227,9 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 
 #################
 
-release=grep -e '^ID=' /etc/os-release |  cut -c 4-
+release=`grep -e '^ID=' /etc/os-release |  cut -c 4-`
 
-if [ $release == 'arch'  ]; then
+if [[ $release == 'arch'  ]]; then
     iptables-save > /etc/iptables/iptables.rules
     ip6tables-save > /etc/iptables/ip6tables.rules
 
@@ -282,7 +240,7 @@ if [ $release == 'arch'  ]; then
     systemctl enable ip6tables
     systemctl start ip6tables
     systemctl restart ip6tables
-elif [ $release == 'raspbian' ]; then
+elif [[ $release == 'raspbian' ]]; then
     iptables-save > /etc/iptables/rules.v4
     ip6tables-save > /etc/iptables/rules.v4
 
