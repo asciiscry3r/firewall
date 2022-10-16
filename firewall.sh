@@ -138,7 +138,7 @@ iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -f -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
-iptables -A OUTPUT -p udp --dport 67 -j LOG_AND_DROP
+# iptables -A OUTPUT -p udp --dport 68 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --match multiport --dport 0:21 -j LOG_AND_DROP
@@ -153,7 +153,7 @@ iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-# iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
 # ####################################################################
@@ -253,7 +253,7 @@ ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
 ip6tables -A OUTPUT -m ipv6header --header frag --soft -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --dport 547 -j LOG_AND_DROP
+# ip6tables -A OUTPUT -p udp --dport 547 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --dport 0:50 -j LOG_AND_DROP
@@ -268,7 +268,7 @@ ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-# ip6tables -A OUTPUT -s ::1/128 -p ICMP -j DROP
+ip6tables -A OUTPUT -s ::1/128 -p ICMP -j DROP
 ip6tables -A OUTPUT -s ::1/128 -p UDP --sport 53 -j DROP
 ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j DROP
 # ####################################################################
