@@ -50,6 +50,7 @@ iptables -N UDP
 iptables -N LOG_AND_DROP
 iptables -N LOG_AND_REJECT
 iptables -N bad_tcp_packets
+iptables -N icmp_packets
 
 iptables -P FORWARD DROP
 iptables -P OUTPUT ACCEPT
@@ -86,13 +87,11 @@ iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A INPUT -i lo -s 127.0.0.1 -j ACCEPT
-iptables -A INPUT -p icmp -j DROP
-iptables -A INPUT ! -p tcp -j DROP
-iptables -A INPUT ! -p udp -j DROP
-# iptables -A INPUT -p icmp --icmp-type address-mask-request -j LOG_AND_REJECT
-# iptables -A INPUT -p icmp --icmp-type timestamp-request -j LOG_AND_REJECT
-# iptables -A INPUT -p icmp --icmp-type router-solicitation -j LOG_AND_REJECT
-# iptables -A INPUT -p icmp --icmp-type 8 -m conntrack --ctstate NEW -j ACCEPT
+iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 8 -j ACCEPT
+iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 11 -j ACCEPT
+# iptables -A INPUT -p icmp -j DROP
+# iptables -A INPUT ! -p tcp -j DROP
+# iptables -A INPUT ! -p udp -j DROP
 # iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
 # SSH  # Uncomment if you need ssh connection to machine 
 # iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
@@ -127,7 +126,7 @@ iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p TCP --sport 53 -j LOG_AND_DROP
-iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -j DROP
+# iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -j DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
 # TBD MORE EXPLOITS ##################################################
@@ -154,7 +153,7 @@ iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
+# iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
 # ####################################################################
@@ -174,6 +173,7 @@ ip6tables -N UDP
 ip6tables -N LOG_AND_DROP
 ip6tables -N LOG_AND_REJECT
 ip6tables -N bad_tcp_packets
+ip6tables -N icmp_packets
 
 ip6tables -P FORWARD DROP
 ip6tables -P OUTPUT ACCEPT
@@ -201,14 +201,11 @@ ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 ip6tables -A INPUT -i lo -s ::1 -j ACCEPT
-# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type destination-unreachable -j LOG_AND_REJECT
-# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type packet-too-big -j LOG_AND_REJECT
-# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type time-exceeded -j LOG_AND_REJECT
-# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type parameter-problem -j LOG_AND_REJECT
-# ip6tables -A INPUT -p ipv6-icmp --icmpv6-type 128 -m conntrack --ctstate NEW -j ACCEPT
-ip6tables -A INPUT -p icmp -j DROP
-ip6tables -A INPUT ! -p tcp -j DROP
-ip6tables -A INPUT ! -p udp -j DROP
+ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 8 -j ACCEPT
+ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 11 -j ACCEPT
+# ip6tables -A INPUT -p icmp -j DROP
+# ip6tables -A INPUT ! -p tcp -j DROP
+# ip6tables -A INPUT ! -p udp -j DROP
 # ip6tables -A INPUT -s fe80::/10 -p ipv6-icmp -j ACCEPT
 # ip6tables -A INPUT -p udp --sport 547 --dport 546 -j ACCEPT
 # TBD MORE EXPLOITS ###################################################
@@ -236,7 +233,7 @@ ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -j DROP
+# ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -j DROP
 ip6tables -A INPUT -i lo -s ::1/128 -p UDP --sport 53 -j DROP
 ip6tables -A INPUT -i lo -s ::1/128 -p TCP --sport 53 -j DROP
 # ####################################################################
@@ -271,7 +268,7 @@ ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/128 -p ICMP -j DROP
+# ip6tables -A OUTPUT -s ::1/128 -p ICMP -j DROP
 ip6tables -A OUTPUT -s ::1/128 -p UDP --sport 53 -j DROP
 ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j DROP
 # ####################################################################
@@ -301,6 +298,9 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 # ip6tables -t nat -P PREROUTING ACCEPT
 # ip6tables -t nat -P POSTROUTING ACCEPT
 # ip6tables -t nat -P OUTPUT ACCEPT
+
+ip6tables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
+ip6tables -t mangle -A PREROUTING -j DROP
 
 # ip6tables -t mangle -P PREROUTING ACCEPT
 # ip6tables -t mangle -P POSTROUTING ACCEPT
