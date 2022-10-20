@@ -85,6 +85,7 @@ iptables -A bad_tcp_packets -p tcp  -m limit ! --syn -m state --state NEW -j LOG
 --log-prefix "Iptables: Drop new not syn: "
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
+iptables -A INPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A INPUT -i lo -s 127.0.0.1 -j ACCEPT
 iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 8 -j ACCEPT
@@ -160,6 +161,7 @@ iptables -A OUTPUT -s 127.0.0.0/8 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
+iptables -A OUTPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 # ####################################################################
 # iptables -t raw -I OUTPUT -j DROP :)
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
@@ -203,6 +205,7 @@ ip6tables -A bad_tcp_packets -p tcp  -m limit ! --syn -m state --state NEW -j LO
 --log-prefix "Iptables: Drop new not syn: "
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
+ip6tables -A INPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 ip6tables -A INPUT -i lo -s ::1 -j ACCEPT
 ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 8 -j ACCEPT
@@ -279,6 +282,7 @@ ip6tables -A OUTPUT -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/128 -p ICMP -j DROP
 ip6tables -A OUTPUT -s ::1/128 -p UDP --sport 53 -j DROP
 ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j DROP
+iptables -A OUTPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 # ####################################################################
 # ip6tables -t raw -I OUTPUT -j DROP # :)
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
