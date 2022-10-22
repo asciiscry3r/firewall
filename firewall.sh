@@ -205,7 +205,6 @@ ip6tables -A bad_tcp_packets -p tcp  -m limit ! --syn -m state --state NEW -j LO
 --log-prefix "Iptables: Drop new not syn: "
 ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
-ip6tables -A INPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 ip6tables -A INPUT -i lo -s ::1 -j ACCEPT
 ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 8 -j ACCEPT
@@ -282,7 +281,6 @@ ip6tables -A OUTPUT -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/128 -p ICMP -j DROP
 ip6tables -A OUTPUT -s ::1/128 -p UDP --sport 53 -j DROP
 ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j DROP
-iptables -A OUTPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 # ####################################################################
 # ip6tables -t raw -I OUTPUT -j DROP # :)
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
@@ -325,6 +323,17 @@ ip6tables -t mangle -A PREROUTING -j DROP
 release=`grep -e '^ID=' /etc/os-release |  cut -c 4-`
 
 if [[ $release == 'arch' ]]; then
+    iptables-save > /etc/iptables/iptables.rules
+    ip6tables-save > /etc/iptables/ip6tables.rules
+
+    systemctl enable iptables
+    systemctl start iptables
+    systemctl restart iptables
+
+    systemctl enable ip6tables
+    systemctl start ip6tables
+    systemctl restart ip6tables
+elif [[ $release == 'manjaro' ]]; then
     iptables-save > /etc/iptables/iptables.rules
     ip6tables-save > /etc/iptables/ip6tables.rules
 
