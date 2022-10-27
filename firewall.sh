@@ -249,7 +249,7 @@ ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-# ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -j DROP
+ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -j DROP
 ip6tables -A INPUT -i lo -s ::1/128 -p UDP --sport 53 -j DROP
 ip6tables -A INPUT -i lo -s ::1/128 -p TCP --sport 53 -j DROP
 # ####################################################################
