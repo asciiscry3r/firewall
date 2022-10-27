@@ -154,6 +154,14 @@ iptables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
+# Torrents
+iptables -A OUTPUT -p tcp --dport 6881:6889 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --dport 1024:65534 -j LOG_AND_DROP
+iptables -I OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
+iptables -I OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
+iptables -A FORWARD -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
+iptables -A FORWARD -p tcp --dport 6881:6889 -j LOG_AND_DROP
+iptables -A FORWARD -p udp --dport 1024:65534 -j LOG_AND_DROP
 # Possible ME comm and other strange staf used by piracy and hackers #
 iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP -m limit --sport 53 -j LOG_AND_DROP
@@ -274,6 +282,14 @@ ip6tables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
+# Torrents
+ip6tables -A OUTPUT -p tcp --dport 6881:6889 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --dport 1024:65534 -j LOG_AND_DROP
+ip6tables -I OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
+ip6tables -I OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
+ip6tables -A FORWARD -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
+ip6tables -A FORWARD -p tcp --dport 6881:6889 -j LOG_AND_DROP
+ip6tables -A FORWARD -p udp --dport 1024:65534 -j LOG_AND_DROP
 # Possible ME comm and other strange staf used by piracy and hackers #
 ip6tables -A OUTPUT -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
