@@ -99,8 +99,8 @@ iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 11 -j ACCEPT
 # TBD MORE EXPLOITS ##################################################
 iptables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
 iptables -A INPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
-# iptables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT )
-# iptables -A INPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_REJECT )
+iptables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
+iptables -A INPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_REJECT
 # ####################################################################
 iptables -A INPUT -f -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_REJECT
@@ -129,14 +129,14 @@ iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p TCP --sport 53 -j LOG_AND_DROP
-# iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -j DROP
+iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -j DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
 # TBD MORE EXPLOITS ##################################################
 iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
 iptables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
-# iptables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT )
-# iptables -A OUTPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_REJECT )
+iptables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
+iptables -A OUTPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_REJECT
 # ####################################################################
 iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
@@ -157,8 +157,8 @@ iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 # Torrents
 iptables -A OUTPUT -p tcp --dport 6881:6889 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 1024:65534 -j LOG_AND_DROP
-iptables -I OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
-iptables -I OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
+iptables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
 iptables -A FORWARD -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
 iptables -A FORWARD -p tcp --dport 6881:6889 -j LOG_AND_DROP
 iptables -A FORWARD -p udp --dport 1024:65534 -j LOG_AND_DROP
@@ -171,13 +171,13 @@ iptables -A OUTPUT -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
 iptables -A OUTPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 # ####################################################################
-# iptables -t raw -I OUTPUT -j DROP :)
+# iptables -t raw -A OUTPUT -j DROP :)
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 # iptables -A OUTPUT ! -p icmp -j DROP
 # iptables -A OUTPUT ! -p tcp -j DROP
 # iptables -A OUTPUT ! -p udp -j DROP
 
-iptables -t raw -I PREROUTING -m rpfilter --invert -j DROP
+iptables -t raw -A PREROUTING -m rpfilter --invert -j DROP
 iptables -A INPUT -j LOG_AND_REJECT
 
 ########## Ipv6 ######################################################
@@ -285,8 +285,8 @@ ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 # Torrents
 ip6tables -A OUTPUT -p tcp --dport 6881:6889 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 1024:65534 -j LOG_AND_DROP
-ip6tables -I OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
-ip6tables -I OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
+ip6tables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
 ip6tables -A FORWARD -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
 ip6tables -A FORWARD -p tcp --dport 6881:6889 -j LOG_AND_DROP
 ip6tables -A FORWARD -p udp --dport 1024:65534 -j LOG_AND_DROP
@@ -298,10 +298,10 @@ ip6tables -A OUTPUT -s ::1/128 -p ICMP -j DROP
 ip6tables -A OUTPUT -s ::1/128 -p UDP --sport 53 -j DROP
 ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j DROP
 # ####################################################################
-# ip6tables -t raw -I OUTPUT -j DROP # :)
+# ip6tables -t raw -A OUTPUT -j DROP # :)
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 
-ip6tables -t raw -I PREROUTING -m rpfilter --invert -j DROP
+ip6tables -t raw -A PREROUTING -m rpfilter --invert -j DROP
 ip6tables -A INPUT -j LOG_AND_REJECT
 
 
