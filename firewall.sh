@@ -320,6 +320,9 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 # iptables -t mangle -P OUTPUT ACCEPT
 # iptables -t mangle -P FORWARD ACCEPT
 
+iptables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
+iptables -t mangle -A PREROUTING -j DROP
+
 # The "nat" table is not intended for filtering, the use of DROP is therefore inhibited.
 # ip6tables -t nat -P PREROUTING ACCEPT
 # ip6tables -t nat -P POSTROUTING ACCEPT
