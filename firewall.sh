@@ -390,8 +390,6 @@ iptables -t mangle -N bad_tcp_packets
 iptables -t mangle -A bad_tcp_packets -p tcp -m limit -m length --length 20 -j LOG \
 --log-prefix "Iptables mangle: Empty packets: "
 iptables -t mangle -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
-iptables -t mangle -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
--m state --state NEW -j REJECT --reject-with tcp-reset
 iptables -t mangle -A bad_tcp_packets -p tcp  -m limit ! --syn -m state --state NEW -j LOG \
 --log-prefix "Iptables mangle: Drop new not syn: "
 iptables -t mangle -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
@@ -440,8 +438,6 @@ ip6tables -t mangle -N bad_tcp_packets
 ip6tables -t mangle -A bad_tcp_packets -p tcp  -m limit -m length --length 20 -j LOG \
 --log-prefix "Ip6tables mangle: Empty packets: "
 ip6tables -t mangle -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
-ip6tables -t mangle -A bad_tcp_packets -p tcp --tcp-flags SYN,ACK SYN,ACK \
--m state --state NEW -j REJECT --reject-with tcp-reset
 ip6tables -t mangle -A bad_tcp_packets -p tcp  -m limit ! --syn -m state --state NEW -j LOG \
 --log-prefix "Ip6tables mangle: Drop new not syn: "
 ip6tables -t mangle -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
