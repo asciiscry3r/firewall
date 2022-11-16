@@ -349,7 +349,7 @@ ip6tables -t mangle -A PREROUTING -j DROP
 # ip6tables -t mangle -P OUTPUT ACCEPT
 # ip6tables -t mangle -P FORWARD ACCEPT
 
-#################
+##################
 
 release=`grep -e '^ID=' /etc/os-release |  cut -c 4-`
 
