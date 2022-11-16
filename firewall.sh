@@ -154,8 +154,8 @@ iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -f -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
-iptables -A FORWARD -f -j LOG_AND_DROP
-iptables -A FORWARD -p tcp -j bad_tcp_packets
+# iptables -A FORWARD -f -j LOG_AND_DROP
+# iptables -A FORWARD -p tcp -j bad_tcp_packets
 # iptables -A OUTPUT -p udp --dport 68 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --dport 1:21 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_DROP
@@ -313,8 +313,8 @@ ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
-# ip6tables -A FORWARD -p tcp -j bad_tcp_packets
 ip6tables -A OUTPUT -m ipv6header --header frag --soft -j LOG_AND_DROP
+# ip6tables -A FORWARD -p tcp -j bad_tcp_packets
 # ip6tables -A FORWARD -m ipv6header --header frag --soft -j LOG_AND_DROP
 # ip6tables -A OUTPUT -p udp --dport 547 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_DROP
