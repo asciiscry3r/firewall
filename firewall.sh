@@ -364,6 +364,10 @@ if [[ $release == 'arch' ]]; then
     systemctl enable ip6tables
     systemctl start ip6tables
     systemctl restart ip6tables
+
+    if [ -f /usr/lib/systemd/system/opensnitchd.service ]; then
+        systemctl restart opensnitchd
+    fi
 elif [[ $release == 'manjaro' ]]; then
     iptables-save > /etc/iptables/iptables.rules
     ip6tables-save > /etc/iptables/ip6tables.rules
@@ -375,14 +379,14 @@ elif [[ $release == 'manjaro' ]]; then
     systemctl enable ip6tables
     systemctl start ip6tables
     systemctl restart ip6tables
+
+    if [ -f /usr/lib/systemd/system/opensnitchd.service ]; then
+        systemctl restart opensnitchd
+    fi
 elif [[ $release == 'raspbian' ]]; then
     iptables-save > /etc/iptables/rules.v4
     ip6tables-save > /etc/iptables/rules.v4
 
     systemctl enable netfilter-persistent
     systemctl start netfilter-persistent
-fi
-
-if [ -f /usr/lib/systemd/system/opensnitchd.service ]; then
-    systemctl restart opensnitchd
 fi
