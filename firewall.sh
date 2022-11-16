@@ -70,7 +70,7 @@ iptables -A LOG_AND_REJECT -j REJECT --reject-with icmp-proto-unreachable
 # Comment this and rerun script for get access to most networks provided by vpn services
 # 10.0.0.0/8
 
-BLOCKLIST="0.0.0.0/8,100.64.0.0/10,127.0.53.53,169.254.0.0/16,192.0.0.0/24,192.0.2.0/24,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,240.0.0.0/4,255.255.255.255/32,35.190.56.182/32"
+BLOCKLIST="0.0.0.0/8,100.64.0.0/10,127.0.53.53,169.254.0.0/16,192.0.0.0/24,192.0.2.0/24,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,240.0.0.0/4,255.255.255.255/32,35.190.56.182/32,52.73.169.169"
 
 
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
@@ -90,6 +90,7 @@ iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A INPUT -i lo -s 127.0.0.1 -j ACCEPT
 iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 8 -j ACCEPT
 iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 11 -j ACCEPT
+iptables -A icmp_packets -p icmp --icmp-type echo-request -m length --length 86:0xffff -j DROP
 # iptables -A INPUT -p icmp -j DROP
 # iptables -A INPUT ! -p tcp -j DROP
 # iptables -A INPUT ! -p udp -j DROP
@@ -101,6 +102,8 @@ iptables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_RE
 iptables -A INPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
 iptables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
 iptables -A INPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_REJECT
+iptables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
+iptables -A INPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_REJECT
 # ####################################################################
 iptables -A INPUT -f -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_REJECT
@@ -114,10 +117,10 @@ iptables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT
 iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachable
 iptables -A INPUT -p dccp -j LOG_AND_REJECT
 iptables -A INPUT -p sctp -j LOG_AND_REJECT
-iptables -A INPUT -p udp --match multiport --sport 0:21 -j LOG_AND_REJECT
-iptables -A INPUT -p udp --match multiport --dport 0:50 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --match multiport --sport 0:21 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_REJECT
+iptables -A INPUT -p udp --match multiport --sport 1:21 -j LOG_AND_REJECT
+iptables -A INPUT -p udp --match multiport --dport 1:50 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --match multiport --sport 1:21 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_REJECT
 iptables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
 iptables -A INPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
@@ -133,10 +136,12 @@ iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -j DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
 # TBD MORE EXPLOITS ##################################################
-iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
-iptables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
-iptables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
-iptables -A OUTPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_REJECT
+iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
+iptables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP
+iptables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
+iptables -A OUTPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_DROP
+iptables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
+iptables -A OUTPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP
 # ####################################################################
 iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
@@ -144,10 +149,10 @@ iptables -A OUTPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -f -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
 # iptables -A OUTPUT -p udp --dport 68 -j LOG_AND_DROP
-iptables -A OUTPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_DROP
-iptables -A OUTPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_DROP
-iptables -A OUTPUT -p udp --match multiport --dport 0:21 -j LOG_AND_DROP
-iptables -A OUTPUT -p udp --match multiport --sport 0:50 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --match multiport --dport 1:21 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --match multiport --dport 1:21 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --match multiport --sport 1:50 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 664 -j LOG_AND_REJECT
 iptables -A OUTPUT -p tcp --sport 664 -j LOG_AND_REJECT
 iptables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
@@ -178,6 +183,7 @@ iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level 
 # iptables -A OUTPUT ! -p udp -j DROP
 
 iptables -t raw -A PREROUTING -m rpfilter --invert -j DROP
+iptables -A INPUT -s 0.0.0.0/0 -j LOG_AND_REJECT
 iptables -A INPUT -j LOG_AND_REJECT
 
 ########## Ipv6 ######################################################
@@ -217,6 +223,7 @@ ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 ip6tables -A INPUT -i lo -s ::1 -j ACCEPT
 ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 8 -j ACCEPT
 ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 11 -j ACCEPT
+ip6tables -A icmp_packets -p ipv6-icmp --icmpv6-type echo-request -m length --length 86:0xffff -j DROP
 # ip6tables -A INPUT -p icmp -j DROP
 # ip6tables -A INPUT ! -p tcp -j DROP
 # ip6tables -A INPUT ! -p udp -j DROP
@@ -227,6 +234,8 @@ ip6tables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_R
 ip6tables -A INPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
 ip6tables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
 ip6tables -A INPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_REJECT
+ip6tables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
+ip6tables -A INPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP
 # #####################################################################
 ip6tables -A INPUT -m ipv6header --header frag --soft -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_REJECT
@@ -240,10 +249,10 @@ ip6tables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJEC
 ip6tables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp6-adm-prohibited
 ip6tables -A INPUT -p dccp -j LOG_AND_REJECT
 ip6tables -A INPUT -p sctp -j LOG_AND_REJECT
-ip6tables -A INPUT -p udp --match multiport --sport 0:50 -j LOG_AND_REJECT
-ip6tables -A INPUT -p udp --match multiport --dport 0:50 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_REJECT
+ip6tables -A INPUT -p udp --match multiport --sport 1:50 -j LOG_AND_REJECT
+ip6tables -A INPUT -p udp --match multiport --dport 1:50 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 # Possible ME comm and other strange staf used by piracy and hackers #
 ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
@@ -262,8 +271,10 @@ ip6tables -A INPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJEC
 # TBD MORE EXPLOITS ##################################################
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP
-ip6tables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
-ip6tables -A OUTPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_REJECT
+ip6tables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
+ip6tables -A OUTPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_DROP
+ip6tables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
+ip6tables -A OUTPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP
 # ####################################################################
 ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
 # ip6tables -A OUTPUT -s ff02::2 
@@ -272,10 +283,10 @@ ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
 ip6tables -A OUTPUT -m ipv6header --header frag --soft -j LOG_AND_DROP
 # ip6tables -A OUTPUT -p udp --dport 547 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --match multiport --dport 0:50 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --match multiport --sport 0:50 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --match multiport --dport 1:50 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --match multiport --sport 1:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 664 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --sport 664 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
@@ -302,6 +313,7 @@ ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j DROP
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 
 ip6tables -t raw -A PREROUTING -m rpfilter --invert -j DROP
+ip6tables -A INPUT -s ::1/1  -j LOG_AND_REJECT
 ip6tables -A INPUT -j LOG_AND_REJECT
 
 
