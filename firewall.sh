@@ -154,6 +154,8 @@ iptables -A OUTPUT -p dccp -j LOG_AND_DROP
 iptables -A OUTPUT -p sctp -j LOG_AND_DROP
 iptables -A OUTPUT -f -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
+iptables -A FORWARD -f -j LOG_AND_DROP
+iptables -A FORWARD -p tcp -j bad_tcp_packets
 # iptables -A OUTPUT -p udp --dport 68 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --dport 1:21 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_DROP
@@ -279,12 +281,12 @@ ip6tables -A INPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 # Possible ME comm and other strange staf used by piracy and hackers #
-ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p ICMP -j DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p UDP --sport 53 -j DROP
-ip6tables -A INPUT -i lo -s ::1/128 -p TCP --sport 53 -j DROP
+ip6tables -A INPUT -i lo -s ::1/64 -p ICMP -m limit -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/64 -p UDP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/64 -p TCP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/64 -p ICMP -j DROP
+ip6tables -A INPUT -i lo -s ::1/64 -p UDP --sport 53 -j DROP
+ip6tables -A INPUT -i lo -s ::1/64 -p TCP --sport 53 -j DROP
 # ####################################################################
 ip6tables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
@@ -311,7 +313,9 @@ ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
+ip6tables -A FORWARD -p tcp -j bad_tcp_packets
 ip6tables -A OUTPUT -m ipv6header --header frag --soft -j LOG_AND_DROP
+ip6tables -A FORWARD -m ipv6header --header frag --soft -j LOG_AND_DROP
 # ip6tables -A OUTPUT -p udp --dport 547 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_DROP
@@ -343,18 +347,18 @@ ip6tables -A FORWARD -m string --algo bm --string “BitTorrent” -j LOG_AND_DR
 ip6tables -A FORWARD -p tcp --dport 6881:6889 -j LOG_AND_DROP
 ip6tables -A FORWARD -p udp --dport 1024:65534 -j LOG_AND_DROP
 # Possible ME comm and other strange staf used by piracy and hackers #
-ip6tables -A OUTPUT -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/128 -p ICMP -j DROP
-ip6tables -A OUTPUT -s ::1/128 -p UDP --sport 53 -j DROP
-ip6tables -A OUTPUT -s ::1/128 -p TCP --sport 53 -j DROP
-ip6tables -A FORWARD -s ::1/128 -p ICMP -m limit -j LOG_AND_DROP
-ip6tables -A FORWARD -s ::1/128 -p UDP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A FORWARD -s ::1/128 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A FORWARD -s ::1/128 -p ICMP -j DROP
-ip6tables -A FORWARD -s ::1/128 -p UDP --sport 53 -j DROP
-ip6tables -A FORWARD -s ::1/128 -p TCP --sport 53 -j DROP
+ip6tables -A OUTPUT -s ::1/64 -p ICMP -m limit -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/64 -p UDP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/64 -p TCP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/64 -p ICMP -j DROP
+ip6tables -A OUTPUT -s ::1/64 -p UDP --sport 53 -j DROP
+ip6tables -A OUTPUT -s ::1/64 -p TCP --sport 53 -j DROP
+ip6tables -A FORWARD -s ::1/64 -p ICMP -m limit -j LOG_AND_DROP
+ip6tables -A FORWARD -s ::1/64 -p UDP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A FORWARD -s ::1/64 -p TCP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A FORWARD -s ::1/64 -p ICMP -j DROP
+ip6tables -A FORWARD -s ::1/64 -p UDP --sport 53 -j DROP
+ip6tables -A FORWARD -s ::1/64 -p TCP --sport 53 -j DROP
 # ####################################################################
 # ip6tables -t raw -A OUTPUT -j DROP # :)
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
@@ -380,7 +384,7 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 
 iptables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
 iptables -t mangle -A PREROUTING -j DROP
-iptables -t mangle -A FORWARD -m addrtype --dst-type BROADCAST -j DROP
+# iptables -t mangle -A FORWARD -m addrtype --dst-type BROADCAST -j DROP
 iptables -t mangle -s 127.0.0.1/8 -j DROP
 
 # The "nat" table is not intended for filtering, the use of DROP is therefore inhibited.
@@ -390,7 +394,7 @@ iptables -t mangle -s 127.0.0.1/8 -j DROP
 
 ip6tables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
 ip6tables -t mangle -A PREROUTING -j DROP
-ip6tables -t mangle -s 127.0.0.1/8 -j DROP
+ip6tables -t mangle -s ::1/64 -j DROP
 
 # ip6tables -t mangle -P PREROUTING ACCEPT
 # ip6tables -t mangle -P POSTROUTING ACCEPT
