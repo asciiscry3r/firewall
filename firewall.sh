@@ -281,12 +281,12 @@ ip6tables -A INPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 # Possible ME comm and other strange staf used by piracy and hackers #
-ip6tables -A INPUT -i lo -s ::1/64 -p ICMP -m limit -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/64 -p UDP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/64 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A INPUT -i lo -s ::1/64 -p ICMP -j DROP
-ip6tables -A INPUT -i lo -s ::1/64 -p UDP --sport 53 -j DROP
-ip6tables -A INPUT -i lo -s ::1/64 -p TCP --sport 53 -j DROP
+ip6tables -A INPUT -i lo -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A INPUT -i lo -s ::1/32 -p ICMP -j DROP
+ip6tables -A INPUT -i lo -s ::1/32 -p UDP --sport 53 -j DROP
+ip6tables -A INPUT -i lo -s ::1/32 -p TCP --sport 53 -j DROP
 # ####################################################################
 ip6tables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
@@ -347,12 +347,12 @@ ip6tables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DRO
 # ip6tables -A FORWARD -p tcp --dport 6881:6889 -j LOG_AND_DROP
 # ip6tables -A FORWARD -p udp --dport 1024:65534 -j LOG_AND_DROP
 # Possible ME comm and other strange staf used by piracy and hackers #
-ip6tables -A OUTPUT -s ::1/64 -p ICMP -m limit -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/64 -p UDP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/64 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/64 -p ICMP -j DROP
-ip6tables -A OUTPUT -s ::1/64 -p UDP --sport 53 -j DROP
-ip6tables -A OUTPUT -s ::1/64 -p TCP --sport 53 -j DROP
+ip6tables -A OUTPUT -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
+ip6tables -A OUTPUT -s ::1/32 -p ICMP -j DROP
+ip6tables -A OUTPUT -s ::1/32 -p UDP --sport 53 -j DROP
+ip6tables -A OUTPUT -s ::1/32 -p TCP --sport 53 -j DROP
 # ip6tables -A FORWARD -s ::1/64 -p ICMP -m limit -j LOG_AND_DROP
 # ip6tables -A FORWARD -s ::1/64 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 # ip6tables -A FORWARD -s ::1/64 -p TCP -m limit --sport 53 -j LOG_AND_DROP
@@ -444,7 +444,7 @@ ip6tables -t mangle -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DR
 
 ip6tables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
 ip6tables -t mangle -A PREROUTING -j DROP
-ip6tables -t mangle -s ::1/64 -j DROP
+ip6tables -t mangle -s ::1/32 -j DROP
 ip6tables -t mangle -A OUTPUT -p tcp -j bad_tcp_packets
 ip6tables -t mangle -A FORWARD -p tcp -j bad_tcp_packets
 ip6tables -t mangle -A OUTPUT -m ipv6header --header frag --soft -j DROP
