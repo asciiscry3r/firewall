@@ -333,7 +333,8 @@ iptables -t mangle -N bad_tcp_packets
 iptables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
 iptables -t mangle -A PREROUTING -j DROP
 iptables -t mangle -A FORWARD -m addrtype --dst-type BROADCAST -j DROP
-iptables -t mangle -s 127.0.0.1/8 -j DROP
+iptables -t mangle -A OUTPUT -s 127.0.0.0/8 -j DROP
+iptables -t mangle -A FORWARD -s 127.0.0.0/8 -j DROP
 iptables -t mangle -A OUTPUT -f -j DROP
 iptables -t mangle -A FORWARD -f -j DROP
 iptables -t mangle -A OUTPUT -p tcp --match multiport --dport 1:21 -j DROP
@@ -378,7 +379,8 @@ ip6tables -t mangle -N bad_tcp_packets
 
 ip6tables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
 ip6tables -t mangle -A PREROUTING -j DROP
-ip6tables -t mangle -s ::1/32 -j DROP
+ip6tables -t mangle -A OUTPUT -s ::1/32 -j DROP
+ip6tables -t mangle -A FORWARD -s ::1/32 -j DROP
 ip6tables -t mangle -A OUTPUT -m ipv6header --header frag --soft -j DROP
 ip6tables -t mangle -A FORWARD -m ipv6header --header frag --soft -j DROP
 ip6tables -t mangle -A OUTPUT -p tcp --match multiport --dport 1:50 -j DROP
