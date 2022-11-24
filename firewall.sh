@@ -104,6 +104,14 @@ iptables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 
 iptables -A INPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_REJECT
 iptables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
 iptables -A INPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_REJECT
+# FF
+iptables -A INPUT -p tcp \
+  -m connbytes --connbytes 0:1024 \
+    --connbytes-dir both --connbytes-mode bytes \
+  -m state --state ESTABLISHED \
+  -m u32 --u32 "0>>22&0x3C@ 12>>26&0x3C@ 0=0x52464220" \
+  -m string --algo kmp --string "RFB 003." --to 130 \
+  -j REJECT --reject-with tcp-reset
 # ####################################################################
 iptables -A INPUT -f -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_REJECT
@@ -234,6 +242,14 @@ ip6tables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00
 ip6tables -A INPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_REJECT
 ip6tables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
 ip6tables -A INPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP
+# FF
+ip6tables -A INPUT -p tcp \
+  -m connbytes --connbytes 0:1024 \
+    --connbytes-dir both --connbytes-mode bytes \
+  -m state --state ESTABLISHED \
+  -m u32 --u32 "0>>22&0x3C@ 12>>26&0x3C@ 0=0x52464220" \
+  -m string --algo kmp --string "RFB 003." --to 130 \
+  -j REJECT --reject-with tcp-reset
 # ########################################################################
 ip6tables -A INPUT -m ipv6header --header frag --soft -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_REJECT
