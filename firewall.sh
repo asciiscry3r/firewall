@@ -42,7 +42,7 @@ ip -s neighbour flush all
 # arptables -A INPUT --source-mac ${yourmac1} -j ACCEPT
 # arptables -A INPUT --source-mac ${yourmac2} -j ACCEPT
 
-
+######################################################################
 ########## Ipv4 ######################################################
 
 iptables -N TCP
@@ -142,12 +142,6 @@ iptables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00
 iptables -A OUTPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
 iptables -A OUTPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP
-# iptables -A FORWARD -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
-# iptables -A FORWARD -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP
-# iptables -A FORWARD -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
-# iptables -A FORWARD -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_DROP
-# iptables -A FORWARD -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
-# iptables -A FORWARD -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP
 # ####################################################################
 iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -p dccp -j LOG_AND_DROP
@@ -167,25 +161,11 @@ iptables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
-# iptables -A FORWARD -p tcp --match multiport --dport 1:50 -j LOG_AND_DROP
-# iptables -A FORWARD -p tcp --match multiport --sport 1:50 -j LOG_AND_DROP
-# iptables -A FORWARD -p udp --match multiport --dport 1:50 -j LOG_AND_DROP
-# iptables -A FORWARD -p udp --match multiport --sport 1:50 -j LOG_AND_DROP
-# iptables -A FORWARD -p udp --dport 664 -j LOG_AND_DROP
-# iptables -A FORWARD -p tcp --sport 664 -j LOG_AND_DROP
-# iptables -A FORWARD -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
-# iptables -A FORWARD -p udp --match multiport --dport 16992:16996 -j LOG_AND_DROP
-# iptables -A FORWARD -p tcp --match multiport --sport 16992:16996 -j LOG_AND_DROP
-# iptables -A FORWARD -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
-# Torrents
+# Torrents ##############################################################
 iptables -A OUTPUT -p tcp --dport 6881:6889 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 1024:65534 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
-# iptables -A FORWARD -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
-# iptables -A FORWARD -p tcp --dport 6881:6889 -j LOG_AND_DROP
-# iptables -A FORWARD -p udp --dport 1024:65534 -j LOG_AND_DROP
-# iptables -A FORWARD -p udp --dport 1646 -j LOG_AND_DROP
 # Possible ME comm and other strange staf used by piracy and hackers #
 iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP -m limit --sport 53 -j LOG_AND_DROP
@@ -193,25 +173,17 @@ iptables -A OUTPUT -s 127.0.0.0/8 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
-# iptables -A FORWARD -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
-# iptables -A FORWARD -s 127.0.0.0/8 -p UDP -m limit --sport 53 -j LOG_AND_DROP
-# iptables -A FORWARD -s 127.0.0.0/8 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-# iptables -A FORWARD -s 127.0.0.0/8 -p ICMP -j DROP
-# iptables -A FORWARD -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
-# iptables -A FORWARD -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
-# iptables -A FORWARD -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 iptables -A OUTPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 # ####################################################################
-# iptables -t raw -A OUTPUT -j DROP :)
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 # iptables -A OUTPUT ! -p icmp -j DROP
 # iptables -A OUTPUT ! -p tcp -j DROP
 # iptables -A OUTPUT ! -p udp -j DROP
 
 iptables -t raw -A PREROUTING -m rpfilter --invert -j DROP
-iptables -A INPUT -s 0.0.0.0/0 -j LOG_AND_REJECT
 iptables -A INPUT -j LOG_AND_REJECT
 
+######################################################################
 ########## Ipv6 ######################################################
 
 ip6tables -N TCP
@@ -255,14 +227,14 @@ ip6tables -A icmp_packets -p ipv6-icmp --icmpv6-type echo-request -m length --le
 # ip6tables -A INPUT ! -p udp -j DROP
 # ip6tables -A INPUT -s fe80::/10 -p ipv6-icmp -j ACCEPT
 # ip6tables -A INPUT -p udp --sport 547 --dport 546 -j ACCEPT
-# TBD MORE EXPLOITS ###################################################
+# TBD MORE EXPLOITS ######################################################
 ip6tables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
 ip6tables -A INPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_REJECT
 ip6tables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
 ip6tables -A INPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_REJECT
 ip6tables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_REJECT
 ip6tables -A INPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP
-# #####################################################################
+# ########################################################################
 ip6tables -A INPUT -m ipv6header --header frag --soft -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --tcp-flags ALL ALL -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --tcp-flags ALL NONE -j LOG_AND_REJECT
@@ -280,36 +252,29 @@ ip6tables -A INPUT -p udp --match multiport --dport 1:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
-# Possible ME comm and other strange staf used by piracy and hackers #
+# Possible ME comm and other strange staf used by piracy and hackers #####
 ip6tables -A INPUT -i lo -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/32 -p ICMP -j DROP
 ip6tables -A INPUT -i lo -s ::1/32 -p UDP --sport 53 -j DROP
 ip6tables -A INPUT -i lo -s ::1/32 -p TCP --sport 53 -j DROP
-# ####################################################################
-ip6tables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
+# ########################################################################
+ip6tables -A INPUT -p udp --sport 664 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
 ip6tables -A INPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A INPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_REJECT
-# TBD MORE EXPLOITS ##################################################
+# TBD MORE EXPLOITS ######################################################
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
 ip6tables -A OUTPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP
-# ip6tables -A FORWARD -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
-# ip6tables -A FORWARD -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP
-# ip6tables -A FORWARD -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
-# ip6tables -A FORWARD -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_DROP
-# ip6tables -A FORWARD -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
-# ip6tables -A FORWARD -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP
-# ####################################################################
+# ########################################################################
 ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
-# ip6tables -A OUTPUT -s ff02::2 
 ip6tables -A OUTPUT -p dccp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p sctp -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
@@ -321,54 +286,33 @@ ip6tables -A OUTPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --dport 1:50 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --sport 1:50 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --dport 664 -j LOG_AND_DROP
+# #######################################################################
+ip6tables -A OUTPUT -p udp --sport 664 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --sport 664 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
-# ip6tables -A FORWARD -p tcp --match multiport --dport 1:50 -j LOG_AND_DROP
-# ip6tables -A FORWARD -p tcp --match multiport --sport 1:50 -j LOG_AND_DROP
-# ip6tables -A FORWARD -p udp --match multiport --dport 1:50 -j LOG_AND_DROP
-# ip6tables -A FORWARD -p udp --match multiport --sport 1:50 -j LOG_AND_DROP
-# ip6tables -A FORWARD -p udp --dport 664 -j LOG_AND_DROP
-# ip6tables -A FORWARD -p tcp --sport 664 -j LOG_AND_DROP
-# ip6tables -A FORWARD -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
-# ip6tables -A FORWARD -p udp --match multiport --dport 16992:16996 -j LOG_AND_DROP
-# ip6tables -A FORWARD -p tcp --match multiport --sport 16992:16996 -j LOG_AND_DROP
-# ip6tables -A FORWARD -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
-# Torrents
+# Torrents ##############################################################
 ip6tables -A OUTPUT -p tcp --dport 6881:6889 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 1024:65534 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
-# ip6tables -A FORWARD -p udp --dport 1646 -j LOG_AND_DROP
-# ip6tables -A FORWARD -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
-# ip6tables -A FORWARD -p tcp --dport 6881:6889 -j LOG_AND_DROP
-# ip6tables -A FORWARD -p udp --dport 1024:65534 -j LOG_AND_DROP
-# Possible ME comm and other strange staf used by piracy and hackers #
+# Possible ME comm and other strange staf used by piracy and hackers ####
 ip6tables -A OUTPUT -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p ICMP -j DROP
 ip6tables -A OUTPUT -s ::1/32 -p UDP --sport 53 -j DROP
 ip6tables -A OUTPUT -s ::1/32 -p TCP --sport 53 -j DROP
-# ip6tables -A FORWARD -s ::1/64 -p ICMP -m limit -j LOG_AND_DROP
-# ip6tables -A FORWARD -s ::1/64 -p UDP -m limit --sport 53 -j LOG_AND_DROP
-# ip6tables -A FORWARD -s ::1/64 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-# ip6tables -A FORWARD -s ::1/64 -p ICMP -j DROP
-# ip6tables -A FORWARD -s ::1/64 -p UDP --sport 53 -j DROP
-# ip6tables -A FORWARD -s ::1/64 -p TCP --sport 53 -j DROP
-# ####################################################################
-# ip6tables -t raw -A OUTPUT -j DROP # :)
+# #######################################################################
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 
 ip6tables -t raw -A PREROUTING -m rpfilter --invert -j DROP
-ip6tables -A INPUT -s ::1/1  -j LOG_AND_REJECT
 ip6tables -A INPUT -j LOG_AND_REJECT
 
 #########################################################################################
-# NAT and Mangle ########################################################################
+# IPV4 NAT and Mangle ###################################################################
 #########################################################################################
 
 # The "nat" table is not intended for filtering, the use of DROP is therefore inhibited.
@@ -384,29 +328,19 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 
 iptables -t mangle -N bad_tcp_packets
 
-# From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
-# Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
-# bad_tcp_packets chain
-iptables -t mangle -A bad_tcp_packets -p tcp -m limit -m length --length 20 -j LOG \
---log-prefix "Iptables mangle: Empty packets: "
-iptables -t mangle -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
-iptables -t mangle -A bad_tcp_packets -p tcp  -m limit ! --syn -m state --state NEW -j LOG \
---log-prefix "Iptables mangle: Drop new not syn: "
-iptables -t mangle -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
+########################################################################################
 
 iptables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
 iptables -t mangle -A PREROUTING -j DROP
 iptables -t mangle -A FORWARD -m addrtype --dst-type BROADCAST -j DROP
 iptables -t mangle -s 127.0.0.1/8 -j DROP
 iptables -t mangle -A OUTPUT -f -j DROP
-iptables -t mangle -A OUTPUT -p tcp -j bad_tcp_packets
 iptables -t mangle -A FORWARD -f -j DROP
-iptables -t mangle -A FORWARD -p tcp -j bad_tcp_packets
 iptables -t mangle -A OUTPUT -p tcp --match multiport --dport 1:21 -j DROP
 iptables -t mangle -A OUTPUT -p tcp --match multiport --sport 1:50 -j DROP
 iptables -t mangle -A OUTPUT -p udp --match multiport --dport 1:21 -j DROP
 iptables -t mangle -A OUTPUT -p udp --match multiport --sport 1:50 -j DROP
-iptables -t mangle -A OUTPUT -p udp --dport 664 -j DROP
+iptables -t mangle -A OUTPUT -p udp --sport 664 -j DROP
 iptables -t mangle -A OUTPUT -p tcp --sport 664 -j DROP
 iptables -t mangle -A OUTPUT -p udp --match multiport --sport 16992:16996 -j DROP
 iptables -t mangle -A OUTPUT -p udp --match multiport --dport 16992:16996 -j DROP
@@ -416,44 +350,42 @@ iptables -t mangle -A FORWARD -p tcp --match multiport --dport 1:50 -j DROP
 iptables -t mangle -A FORWARD -p tcp --match multiport --sport 1:50 -j DROP
 iptables -t mangle -A FORWARD -p udp --match multiport --dport 1:50 -j DROP
 iptables -t mangle -A FORWARD -p udp --match multiport --sport 1:50 -j DROP
-iptables -t mangle -A FORWARD -p udp --dport 664 -j DROP
+iptables -t mangle -A FORWARD -p udp --sport 664 -j DROP
 iptables -t mangle -A FORWARD -p tcp --sport 664 -j DROP
 iptables -t mangle -A FORWARD -p udp --match multiport --sport 16992:16996 -j DROP
 iptables -t mangle -A FORWARD -p udp --match multiport --dport 16992:16996 -j DROP
 iptables -t mangle -A FORWARD -p tcp --match multiport --sport 16992:16996 -j DROP
 iptables -t mangle -A FORWARD -p tcp --match multiport --dport 16992:16996 -j DROP
 
+#########################################################################################
+# IPV6 NAT and Mangle ###################################################################
+#########################################################################################
 
-########################################################################################
 # The "nat" table is not intended for filtering, the use of DROP is therefore inhibited.
 # ip6tables -t nat -P PREROUTING ACCEPT
 # ip6tables -t nat -P POSTROUTING ACCEPT
 # ip6tables -t nat -P OUTPUT ACCEPT
 
+# ip6tables -t mangle -P PREROUTING ACCEPT
+# ip6tables -t mangle -P POSTROUTING ACCEPT
+# ip6tables -t mangle -P INPUT ACCEPT
+# ip6tables -t mangle -P OUTPUT ACCEPT
+# ip6tables -t mangle -P FORWARD ACCEPT
+
 ip6tables -t mangle -N bad_tcp_packets
 
-# From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
-# Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
-# bad_tcp_packets chain
-ip6tables -t mangle -A bad_tcp_packets -p tcp  -m limit -m length --length 20 -j LOG \
---log-prefix "Ip6tables mangle: Empty packets: "
-ip6tables -t mangle -A bad_tcp_packets -p tcp -m length --length 20 -j DROP
-ip6tables -t mangle -A bad_tcp_packets -p tcp  -m limit ! --syn -m state --state NEW -j LOG \
---log-prefix "Ip6tables mangle: Drop new not syn: "
-ip6tables -t mangle -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
+########################################################################################
 
 ip6tables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
 ip6tables -t mangle -A PREROUTING -j DROP
 ip6tables -t mangle -s ::1/32 -j DROP
-ip6tables -t mangle -A OUTPUT -p tcp -j bad_tcp_packets
-ip6tables -t mangle -A FORWARD -p tcp -j bad_tcp_packets
 ip6tables -t mangle -A OUTPUT -m ipv6header --header frag --soft -j DROP
 ip6tables -t mangle -A FORWARD -m ipv6header --header frag --soft -j DROP
 ip6tables -t mangle -A OUTPUT -p tcp --match multiport --dport 1:50 -j DROP
 ip6tables -t mangle -A OUTPUT -p tcp --match multiport --sport 1:50 -j DROP
 ip6tables -t mangle -A OUTPUT -p udp --match multiport --dport 1:50 -j DROP
 ip6tables -t mangle -A OUTPUT -p udp --match multiport --sport 1:50 -j DROP
-ip6tables -t mangle -A OUTPUT -p udp --dport 664 -j DROP
+ip6tables -t mangle -A OUTPUT -p udp --sport 664 -j DROP
 ip6tables -t mangle -A OUTPUT -p tcp --sport 664 -j DROP
 ip6tables -t mangle -A OUTPUT -p udp --match multiport --sport 16992:16996 -j DROP
 ip6tables -t mangle -A OUTPUT -p udp --match multiport --dport 16992:16996 -j DROP
@@ -463,18 +395,12 @@ ip6tables -t mangle -A FORWARD -p tcp --match multiport --dport 1:50 -j DROP
 ip6tables -t mangle -A FORWARD -p tcp --match multiport --sport 1:50 -j DROP
 ip6tables -t mangle -A FORWARD -p udp --match multiport --dport 1:50 -j DROP
 ip6tables -t mangle -A FORWARD -p udp --match multiport --sport 1:50 -j DROP
-ip6tables -t mangle -A FORWARD -p udp --dport 664 -j DROP
+ip6tables -t mangle -A FORWARD -p udp --sport 664 -j DROP
 ip6tables -t mangle -A FORWARD -p tcp --sport 664 -j DROP
 ip6tables -t mangle -A FORWARD -p udp --match multiport --sport 16992:16996 -j DROP
 ip6tables -t mangle -A FORWARD -p udp --match multiport --dport 16992:16996 -j DROP
 ip6tables -t mangle -A FORWARD -p tcp --match multiport --sport 16992:16996 -j DROP
 ip6tables -t mangle -A FORWARD -p tcp --match multiport --dport 16992:16996 -j DROP
-
-# ip6tables -t mangle -P PREROUTING ACCEPT
-# ip6tables -t mangle -P POSTROUTING ACCEPT
-# ip6tables -t mangle -P INPUT ACCEPT
-# ip6tables -t mangle -P OUTPUT ACCEPT
-# ip6tables -t mangle -P FORWARD ACCEPT
 
 ####################################################################################
 
