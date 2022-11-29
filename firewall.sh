@@ -342,8 +342,6 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 # iptables -t mangle -P OUTPUT ACCEPT
 # iptables -t mangle -P FORWARD ACCEPT
 
-iptables -t mangle -N bad_tcp_packets
-
 ########################################################################################
 
 iptables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
@@ -388,8 +386,6 @@ iptables -t mangle -A FORWARD -p tcp --match multiport --dport 16992:16996 -j DR
 # ip6tables -t mangle -P INPUT ACCEPT
 # ip6tables -t mangle -P OUTPUT ACCEPT
 # ip6tables -t mangle -P FORWARD ACCEPT
-
-ip6tables -t mangle -N bad_tcp_packets
 
 ########################################################################################
 
@@ -460,4 +456,13 @@ elif [[ $release == 'raspbian' ]]; then
 
     systemctl enable netfilter-persistent
     systemctl start netfilter-persistent
+    systemctl restart netfilter-persistent
+elif [[ $release == 'ubuntu' ]]; then
+    iptables-save > /etc/iptables/rules.v4
+    ip6tables-save > /etc/iptables/rules.v4
+
+    systemctl enable netfilter-persistent
+    systemctl start netfilter-persistent
+    systemctl restart netfilter-persistent
+    systemctl restart opensnitch
 fi
