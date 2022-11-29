@@ -439,6 +439,11 @@ elif [[ $release == 'manjaro' ]]; then
     iptables-save > /etc/iptables/iptables.rules
     ip6tables-save > /etc/iptables/ip6tables.rules
 
+    if [ -f /usr/lib/systemd/system/ufw.service ]; then
+        systemctl disable ufw
+        systemctl stop ufw
+    fi
+
     systemctl enable iptables
     systemctl start iptables
     systemctl restart iptables
