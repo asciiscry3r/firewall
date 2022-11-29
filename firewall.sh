@@ -38,9 +38,9 @@ ip6tables -t mangle -X
 #
 
 ip -s neighbour flush all
-# arptables --flush
-# arptables -A INPUT --source-mac ${yourmac1} -j ACCEPT
-# arptables -A INPUT --source-mac ${yourmac2} -j ACCEPT
+arptables --flush
+# arptables -A INPUT --source-mac 00:00:00:00:00:00 -j DROP
+# arptables -A OUTPUT --source-mac 00:00:00:00:00:00 -j DROP
 
 ######################################################################
 ########## Ipv4 ######################################################
