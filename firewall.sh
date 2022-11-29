@@ -454,17 +454,28 @@ elif [[ $release == 'raspbian' ]]; then
     iptables-save > /etc/iptables/rules.v4
     ip6tables-save > /etc/iptables/rules.v4
 
+    if [ -f /usr/lib/systemd/system/ufw.service ]; then
+        systemctl disable ufw
+        systemctl stop ufw
+    fi
     systemctl enable netfilter-persistent
     systemctl start netfilter-persistent
     systemctl restart netfilter-persistent
+    if [ -f /usr/lib/systemd/system/opensnitchd.service ]; then
+        systemctl restart opensnitch
+    fi
 elif [[ $release == 'ubuntu' ]]; then
     iptables-save > /etc/iptables/rules.v4
     ip6tables-save > /etc/iptables/rules.v4
 
-    systemctl disable ufw
-    systemctl stop ufw
+    if [ -f /usr/lib/systemd/system/ufw.service ]; then
+        systemctl disable ufw
+        systemctl stop ufw
+    fi
     systemctl enable netfilter-persistent
     systemctl start netfilter-persistent
     systemctl restart netfilter-persistent
-    systemctl restart opensnitch
+    if [ -f /usr/lib/systemd/system/opensnitchd.service ]; then
+        systemctl restart opensnitch
+    fi
 fi
