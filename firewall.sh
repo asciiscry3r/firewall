@@ -461,6 +461,8 @@ elif [[ $release == 'ubuntu' ]]; then
     iptables-save > /etc/iptables/rules.v4
     ip6tables-save > /etc/iptables/rules.v4
 
+    systemctl disable ufw
+    systemctl stop ufw
     systemctl enable netfilter-persistent
     systemctl start netfilter-persistent
     systemctl restart netfilter-persistent
