@@ -88,14 +88,14 @@ iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 iptables -A INPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A INPUT -i lo -s 127.0.0.1 -j ACCEPT
-iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 8 -j ACCEPT
-iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 11 -j ACCEPT
-iptables -A icmp_packets -p icmp --icmp-type echo-request -m length --length 86:0xffff -j DROP
-# iptables -A INPUT -p icmp -j DROP
+# iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 8 -j ACCEPT
+# iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 11 -j ACCEPT
+# iptables -A icmp_packets -p icmp --icmp-type echo-request -m length --length 86:0xffff -j DROP
+iptables -A INPUT -p icmp -j DROP
 # iptables -A INPUT ! -p tcp -j DROP
 # iptables -A INPUT ! -p udp -j DROP
 # iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_REJECT
-# SSH  # Uncomment if you need ssh connection to machine 
+# SSH  # Uncomment if you need ssh connection to machine
 # iptables -A INPUT -p tcp --dport 22 -m conntrack --ctstate NEW -j IN_SSH
 # TBD MORE EXPLOITS ##################################################
 iptables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_REJECT
@@ -141,8 +141,8 @@ iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p TCP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -j DROP
-iptables -A INPUT -i lo -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
-iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
+iptables -A INPUT -i lo -s 127.0.0.0/8 -j DROP
+# iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP -j DROP
 # TBD MORE EXPLOITS ##################################################
 iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP
@@ -179,8 +179,8 @@ iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
-iptables -A OUTPUT -s 127.0.0.0/8 -p UDP --sport 53 -j DROP
-iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -j DROP
+# iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
 iptables -A OUTPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 # ####################################################################
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
@@ -227,10 +227,10 @@ ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 ip6tables -A INPUT -i lo -s ::1 -j ACCEPT
-ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 8 -j ACCEPT
-ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 11 -j ACCEPT
-ip6tables -A icmp_packets -p ipv6-icmp --icmpv6-type echo-request -m length --length 86:0xffff -j DROP
-# ip6tables -A INPUT -p icmp -j DROP
+# ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 8 -j ACCEPT
+# ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 11 -j ACCEPT
+# ip6tables -A icmp_packets -p ipv6-icmp --icmpv6-type echo-request -m length --length 86:0xffff -j DROP
+ip6tables -A INPUT -p icmp -j DROP
 # ip6tables -A INPUT ! -p tcp -j DROP
 # ip6tables -A INPUT ! -p udp -j DROP
 # ip6tables -A INPUT -s fe80::/10 -p ipv6-icmp -j ACCEPT
@@ -273,8 +273,8 @@ ip6tables -A INPUT -i lo -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/32 -p ICMP -j DROP
-ip6tables -A INPUT -i lo -s ::1/32 -p UDP --sport 53 -j DROP
-ip6tables -A INPUT -i lo -s ::1/32 -p TCP --sport 53 -j DROP
+ip6tables -A INPUT -i lo -s ::1/32 -j DROP
+# ip6tables -A INPUT -i lo -s ::1/32 -p TCP --sport 53 -j DROP
 # ########################################################################
 ip6tables -A INPUT -p udp --sport 664 -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
@@ -319,8 +319,8 @@ ip6tables -A OUTPUT -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p ICMP -j DROP
-ip6tables -A OUTPUT -s ::1/32 -p UDP --sport 53 -j DROP
-ip6tables -A OUTPUT -s ::1/32 -p TCP --sport 53 -j DROP
+ip6tables -A OUTPUT -s ::1/32 -j DROP
+# ip6tables -A OUTPUT -s ::1/32 -p TCP --sport 53 -j DROP
 # #######################################################################
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 
@@ -463,9 +463,11 @@ elif [[ $release == 'raspbian' ]]; then
         systemctl disable ufw
         systemctl stop ufw
     fi
+
     systemctl enable netfilter-persistent
     systemctl start netfilter-persistent
     systemctl restart netfilter-persistent
+
     if [ -f /usr/lib/systemd/system/opensnitchd.service ]; then
         systemctl restart opensnitch
     fi
@@ -477,9 +479,11 @@ elif [[ $release == 'ubuntu' ]]; then
         systemctl disable ufw
         systemctl stop ufw
     fi
+
     systemctl enable netfilter-persistent
     systemctl start netfilter-persistent
     systemctl restart netfilter-persistent
+
     if [ -f /usr/lib/systemd/system/opensnitchd.service ]; then
         systemctl restart opensnitch
     fi
