@@ -119,10 +119,11 @@ iptables -A INPUT -p tcp --tcp-flags ALL NONE -j LOG_AND_REJECT
 iptables -A INPUT -p tcp -m tcp --tcp-flags RST RST -m limit --limit 2/second --limit-burst 2 -j ACCEPT
 iptables -A INPUT -m conntrack --ctstate INVALID -j LOG_AND_REJECT
 iptables -A INPUT -p udp -m conntrack --ctstate NEW -j UDP
-iptables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
 iptables -A INPUT -p tcp -j bad_tcp_packets
 iptables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT --reject-with tcp-reset
 iptables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp-port-unreachable
+iptables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
+######################################################################
 iptables -A INPUT -p dccp -j LOG_AND_REJECT
 iptables -A INPUT -p sctp -j LOG_AND_REJECT
 iptables -A INPUT -p udp --match multiport --sport 1:21 -j LOG_AND_REJECT
@@ -141,7 +142,7 @@ iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p TCP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -j DROP
-iptables -A INPUT -i lo -s 127.0.0.0/8 -j DROP
+iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -j LOG_AND_DROP
 # iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP -j DROP
 # TBD MORE EXPLOITS ##################################################
 iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
@@ -179,7 +180,7 @@ iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
-iptables -A OUTPUT -s 127.0.0.0/8 -j DROP
+iptables -A OUTPUT -s 127.0.0.0/8 -m limit -j LOG_AND_DROP
 # iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
 iptables -A OUTPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 # ####################################################################
@@ -257,10 +258,11 @@ ip6tables -A INPUT -p tcp --tcp-flags ALL NONE -j LOG_AND_REJECT
 ip6tables -A INPUT -p tcp -m tcp --tcp-flags RST RST -m limit --limit 2/second --limit-burst 2 -j ACCEPT
 ip6tables -A INPUT -m conntrack --ctstate INVALID -j LOG_AND_REJECT
 ip6tables -A INPUT -p udp -m conntrack --ctstate NEW -j UDP
-ip6tables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
 ip6tables -A INPUT -p tcp -j bad_tcp_packets
 ip6tables -A INPUT -p tcp -m recent --set --rsource --name TCP-PORTSCAN -j REJECT --reject-with tcp-reset
 ip6tables -A INPUT -p udp -m recent --set --rsource --name UDP-PORTSCAN -j REJECT --reject-with icmp6-adm-prohibited
+ip6tables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
+##########################################################################
 ip6tables -A INPUT -p dccp -j LOG_AND_REJECT
 ip6tables -A INPUT -p sctp -j LOG_AND_REJECT
 ip6tables -A INPUT -p udp --match multiport --sport 1:50 -j LOG_AND_REJECT
@@ -273,7 +275,7 @@ ip6tables -A INPUT -i lo -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A INPUT -i lo -s ::1/32 -p ICMP -j DROP
-ip6tables -A INPUT -i lo -s ::1/32 -j DROP
+ip6tables -A INPUT -i lo -s ::1/32 -m limit -j LOG_AND_DROP
 # ip6tables -A INPUT -i lo -s ::1/32 -p TCP --sport 53 -j DROP
 # ########################################################################
 ip6tables -A INPUT -p udp --sport 664 -j LOG_AND_REJECT
@@ -319,7 +321,7 @@ ip6tables -A OUTPUT -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p ICMP -j DROP
-ip6tables -A OUTPUT -s ::1/32 -j DROP
+ip6tables -A OUTPUT -s ::1/32 -m limit -j LOG_AND_DROP
 # ip6tables -A OUTPUT -s ::1/32 -p TCP --sport 53 -j DROP
 # #######################################################################
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
