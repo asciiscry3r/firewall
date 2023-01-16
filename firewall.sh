@@ -85,7 +85,7 @@ iptables -A bad_tcp_packets -p tcp  -m limit ! --syn -m state --state NEW -j LOG
 --log-prefix "Iptables: Drop new not syn: "
 iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
-iptables -A INPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
+# iptables -A INPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A INPUT -i lo -s 127.0.0.1 -j ACCEPT
 # iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 8 -j ACCEPT
@@ -142,7 +142,7 @@ iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p TCP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -j DROP
-iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -j LOG_AND_DROP
+# iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -j LOG_AND_DROP
 # iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP -j DROP
 # TBD MORE EXPLOITS ##################################################
 iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
@@ -172,7 +172,8 @@ iptables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 # Torrents ##############################################################
 iptables -A OUTPUT -p tcp --dport 6881:6889 -j LOG_AND_DROP
-iptables -A OUTPUT -p udp --dport 1024:65534 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --dport 1024:5352 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --dport 5354:65534 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
 # Possible ME comm and other strange staf used by piracy and hackers #
@@ -180,9 +181,9 @@ iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
-iptables -A OUTPUT -s 127.0.0.0/8 -m limit -j LOG_AND_DROP
+# iptables -A OUTPUT -s 127.0.0.0/8 -m limit -j LOG_AND_DROP
 # iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
-iptables -A OUTPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
+# iptables -A OUTPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 # ####################################################################
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 # iptables -A OUTPUT ! -p icmp -j DROP
@@ -211,9 +212,9 @@ ip6tables -A LOG_AND_DROP -j DROP
 ip6tables -A LOG_AND_REJECT -j LOG --log-prefix "Iptables: v6Reject: " --log-level 7
 ip6tables -A LOG_AND_REJECT -j REJECT --reject-with icmp6-adm-prohibited
 
-V6BLOCKLIST="::/128,::1/128,::ffff:0:0/96,::/96,100::/64,2001:10::/28,2001:10::/28,2001:db8::/32,fc00::/7,fe80::/10,fec0::/10,2600:1901:0:8813::/128,2002::/24,2002:a00::/24,2002:a00::/24,2002:a9fe::/24,2002:ac10::/28,2002:c000::/40,2002:c000:200::/40,2002:c0a8::/32,2002:c612::/31,2002:c633:6400::/40,2002:cb00:7100::/40,2002:e000::/20,2002:f000::/20,2002:ffff:ffff::/48,2001::/40,2001:0:a00::/40,2001:0:7f00::/40,2001:0:c000::/56,2001:0:ac10::/44,2001:0:a9fe::/48,2001:0:c000:200::/56,2001:0:c0a8::/48,2001:0:c612::/47,2001:0:c633:6400::/56,2001:0:cb00:7100::/56,2001:0:e000::/36,2001:0:f000::/36"
+V6BLOCKLIST="::/128,::1/128,::ffff:0:0/96,::/96,100::/64,2001:10::/28,2001:10::/28,2001:db8::/32,fc00::/7,fec0::/10,2600:1901:0:8813::/128,2002::/24,2002:a00::/24,2002:a00::/24,2002:a9fe::/24,2002:ac10::/28,2002:c000::/40,2002:c000:200::/40,2002:c0a8::/32,2002:c612::/31,2002:c633:6400::/40,2002:cb00:7100::/40,2002:e000::/20,2002:f000::/20,2002:ffff:ffff::/48,2001::/40,2001:0:a00::/40,2001:0:7f00::/40,2001:0:c000::/56,2001:0:ac10::/44,2001:0:a9fe::/48,2001:0:c000:200::/56,2001:0:c0a8::/48,2001:0:c612::/47,2001:0:c633:6400::/56,2001:0:cb00:7100::/56,2001:0:e000::/36,2001:0:f000::/36"
 
-# ff00::/8
+# ff00::/8, fe80::/10
 # From rc.DMZ.firewall - DMZ IP Firewall script for Linux 2.4.x and iptables
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
 # bad_tcp_packets chain
