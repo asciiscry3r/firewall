@@ -50,7 +50,6 @@ iptables -N UDP
 iptables -N LOG_AND_DROP
 iptables -N LOG_AND_REJECT
 iptables -N bad_tcp_packets
-iptables -N icmp_packets
 
 iptables -P FORWARD DROP
 iptables -P OUTPUT ACCEPT
@@ -142,8 +141,6 @@ iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p UDP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -p TCP --sport 53 -j LOG_AND_DROP
 iptables -A INPUT -i lo -s 127.0.0.0/8 -p ICMP -j DROP
-# iptables -A INPUT -i lo -s 127.0.0.0/8 -m limit -j LOG_AND_DROP
-# iptables -A INPUT -i lo -s 127.0.0.0/8 -p TCP -j DROP
 # TBD MORE EXPLOITS ##################################################
 iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP
@@ -323,8 +320,6 @@ ip6tables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DRO
 ip6tables -A OUTPUT -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-# ip6tables -A OUTPUT -s ::1/32 -m limit -j LOG_AND_DROP
-# ip6tables -A OUTPUT -s ::1/32 -p TCP --sport 53 -j DROP
 # #######################################################################
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 
@@ -335,90 +330,19 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 # IPV4 NAT and Mangle ###################################################################
 #########################################################################################
 
-# The "nat" table is not intended for filtering, the use of DROP is therefore inhibited.
-# iptables -t nat -P PREROUTING ACCEPT
-# iptables -t nat -P POSTROUTING ACCEPT
-# iptables -t nat -P OUTPUT ACCEPT
-
-# iptables -t mangle -P PREROUTING ACCEPT
-# iptables -t mangle -P POSTROUTING ACCEPT
-# iptables -t mangle -P INPUT ACCEPT
-# iptables -t mangle -P OUTPUT ACCEPT
-# iptables -t mangle -P FORWARD ACCEPT
-
-########################################################################################
-
 iptables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
 iptables -t mangle -A PREROUTING -j DROP
-#iptables -t mangle -A FORWARD -m addrtype --dst-type BROADCAST -j DROP
-#iptables -t mangle -A OUTPUT -s 127.0.0.0/8 -j DROP
-#iptables -t mangle -A FORWARD -s 127.0.0.0/8 -j DROP
 iptables -t mangle -A OUTPUT -f -j DROP
 iptables -t mangle -A FORWARD -f -j DROP
-#iptables -t mangle -A OUTPUT -p tcp --match multiport --dport 1:21 -j DROP
-#iptables -t mangle -A OUTPUT -p tcp --match multiport --sport 1:50 -j DROP
-#iptables -t mangle -A OUTPUT -p udp --match multiport --dport 1:21 -j DROP
-#iptables -t mangle -A OUTPUT -p udp --match multiport --sport 1:50 -j DROP
-#iptables -t mangle -A OUTPUT -p udp --sport 664 -j DROP
-#iptables -t mangle -A OUTPUT -p tcp --sport 664 -j DROP
-#iptables -t mangle -A OUTPUT -p udp --match multiport --sport 16992:16996 -j DROP
-#iptables -t mangle -A OUTPUT -p udp --match multiport --dport 16992:16996 -j DROP
-#iptables -t mangle -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j DROP
-#iptables -t mangle -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j DROP
-#iptables -t mangle -A FORWARD -p tcp --match multiport --dport 1:50 -j DROP
-#iptables -t mangle -A FORWARD -p tcp --match multiport --sport 1:50 -j DROP
-#iptables -t mangle -A FORWARD -p udp --match multiport --dport 1:50 -j DROP
-#iptables -t mangle -A FORWARD -p udp --match multiport --sport 1:50 -j DROP
-#iptables -t mangle -A FORWARD -p udp --sport 664 -j DROP
-#iptables -t mangle -A FORWARD -p tcp --sport 664 -j DROP
-#iptables -t mangle -A FORWARD -p udp --match multiport --sport 16992:16996 -j DROP
-#iptables -t mangle -A FORWARD -p udp --match multiport --dport 16992:16996 -j DROP
-#iptables -t mangle -A FORWARD -p tcp --match multiport --sport 16992:16996 -j DROP
-#iptables -t mangle -A FORWARD -p tcp --match multiport --dport 16992:16996 -j DROP
 
 #########################################################################################
 # IPV6 NAT and Mangle ###################################################################
 #########################################################################################
 
-# The "nat" table is not intended for filtering, the use of DROP is therefore inhibited.
-# ip6tables -t nat -P PREROUTING ACCEPT
-# ip6tables -t nat -P POSTROUTING ACCEPT
-# ip6tables -t nat -P OUTPUT ACCEPT
-
-# ip6tables -t mangle -P PREROUTING ACCEPT
-# ip6tables -t mangle -P POSTROUTING ACCEPT
-# ip6tables -t mangle -P INPUT ACCEPT
-# ip6tables -t mangle -P OUTPUT ACCEPT
-# ip6tables -t mangle -P FORWARD ACCEPT
-
-########################################################################################
-
 ip6tables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
 ip6tables -t mangle -A PREROUTING -j DROP
-#ip6tables -t mangle -A OUTPUT -s ::1/32 -j DROP
-#ip6tables -t mangle -A FORWARD -s ::1/32 -j DROP
 ip6tables -t mangle -A OUTPUT -m ipv6header --header frag --soft -j DROP
 ip6tables -t mangle -A FORWARD -m ipv6header --header frag --soft -j DROP
-#ip6tables -t mangle -A OUTPUT -p tcp --match multiport --dport 1:50 -j DROP
-#ip6tables -t mangle -A OUTPUT -p tcp --match multiport --sport 1:50 -j DROP
-#ip6tables -t mangle -A OUTPUT -p udp --match multiport --dport 1:50 -j DROP
-#ip6tables -t mangle -A OUTPUT -p udp --match multiport --sport 1:50 -j DROP
-#ip6tables -t mangle -A OUTPUT -p udp --sport 664 -j DROP
-#ip6tables -t mangle -A OUTPUT -p tcp --sport 664 -j DROP
-#ip6tables -t mangle -A OUTPUT -p udp --match multiport --sport 16992:16996 -j DROP
-#ip6tables -t mangle -A OUTPUT -p udp --match multiport --dport 16992:16996 -j DROP
-#ip6tables -t mangle -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j DROP
-#ip6tables -t mangle -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j DROP
-#ip6tables -t mangle -A FORWARD -p tcp --match multiport --dport 1:50 -j DROP
-#ip6tables -t mangle -A FORWARD -p tcp --match multiport --sport 1:50 -j DROP
-#ip6tables -t mangle -A FORWARD -p udp --match multiport --dport 1:50 -j DROP
-#ip6tables -t mangle -A FORWARD -p udp --match multiport --sport 1:50 -j DROP
-#ip6tables -t mangle -A FORWARD -p udp --sport 664 -j DROP
-#ip6tables -t mangle -A FORWARD -p tcp --sport 664 -j DROP
-#ip6tables -t mangle -A FORWARD -p udp --match multiport --sport 16992:16996 -j DROP
-#ip6tables -t mangle -A FORWARD -p udp --match multiport --dport 16992:16996 -j DROP
-#ip6tables -t mangle -A FORWARD -p tcp --match multiport --sport 16992:16996 -j DROP
-#ip6tables -t mangle -A FORWARD -p tcp --match multiport --dport 16992:16996 -j DROP
 
 ####################################################################################
 
