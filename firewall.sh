@@ -173,14 +173,14 @@ iptables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 # Torrents ##############################################################
 iptables -A OUTPUT -p tcp --dport 6881:6889 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 1024:5352 -j LOG_AND_DROP
-iptables -A OUTPUT -p udp --dport 5354:65534 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --dport 5354:42739 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --dport 42741:65534 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
 # Possible ME comm and other strange staf used by piracy and hackers #
 iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 iptables -A OUTPUT -s 127.0.0.0/8 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -j DROP
 # iptables -A OUTPUT -s 127.0.0.0/8 -m limit -j LOG_AND_DROP
 # iptables -A OUTPUT -s 127.0.0.0/8 -p TCP --sport 53 -j DROP
 # iptables -A OUTPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
@@ -314,15 +314,16 @@ ip6tables -A OUTPUT -p tcp --match multiport --sport 16992:16996 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --match multiport --dport 16992:16996 -j LOG_AND_DROP
 # Torrents ##############################################################
 ip6tables -A OUTPUT -p tcp --dport 6881:6889 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --dport 1024:65534 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --dport 1024:5352 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --dport 5354:35663 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --dport 35665:65534 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
 # Possible ME comm and other strange staf used by piracy and hackers ####
 ip6tables -A OUTPUT -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/32 -p ICMP -j DROP
-ip6tables -A OUTPUT -s ::1/32 -m limit -j LOG_AND_DROP
+# ip6tables -A OUTPUT -s ::1/32 -m limit -j LOG_AND_DROP
 # ip6tables -A OUTPUT -s ::1/32 -p TCP --sport 53 -j DROP
 # #######################################################################
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
