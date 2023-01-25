@@ -87,9 +87,9 @@ iptables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 # iptables -A INPUT -m addrtype --dst-type BROADCAST -j LOG_AND_DROP
 iptables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 iptables -A INPUT -i lo -s 127.0.0.1 -j ACCEPT
-# iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 8 -j ACCEPT
-# iptables -A icmp_packets -p icmp -s 0/0 --icmp-type 11 -j ACCEPT
-# iptables -A icmp_packets -p icmp --icmp-type echo-request -m length --length 86:0xffff -j DROP
+iptables -A INPUT -p icmp -s 0/0 --icmp-type 8 -j ACCEPT
+iptables -A INPUT -p icmp -s 0/0 --icmp-type 11 -j ACCEPT
+iptables -A INPUT -p icmp --icmp-type echo-request -m length --length 86:0xffff -j DROP
 iptables -A INPUT -p icmp -j DROP
 # iptables -A INPUT ! -p tcp -j DROP
 # iptables -A INPUT ! -p udp -j DROP
@@ -173,6 +173,10 @@ iptables -A OUTPUT -p udp --dport 1024:5352 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 5354:42739 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 42741:65534 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --dport 3478 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --dport 3479 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --dport 3478 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --dport 3479 -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
 # Possible ME comm and other strange staf used by piracy and hackers #
 iptables -A OUTPUT -s 127.0.0.0/8 -p ICMP -m limit -j LOG_AND_DROP
@@ -226,9 +230,9 @@ ip6tables -A bad_tcp_packets -p tcp ! --syn -m state --state NEW -j DROP
 
 ip6tables -A INPUT -m conntrack --ctstate RELATED,ESTABLISHED -j ACCEPT
 ip6tables -A INPUT -i lo -s ::1 -j ACCEPT
-# ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 8 -j ACCEPT
-# ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 11 -j ACCEPT
-# ip6tables -A icmp_packets -p ipv6-icmp --icmpv6-type echo-request -m length --length 86:0xffff -j DROP
+ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 8 -j ACCEPT
+ip6tables -A icmp_packets -p ipv6-icmp -s 0/0 --icmpv6-type 11 -j ACCEPT
+ip6tables -A icmp_packets -p ipv6-icmp --icmpv6-type echo-request -m length --length 86:0xffff -j DROP
 ip6tables -A INPUT -p icmp -j DROP
 # ip6tables -A INPUT ! -p tcp -j DROP
 # ip6tables -A INPUT ! -p udp -j DROP
@@ -315,6 +319,10 @@ ip6tables -A OUTPUT -p udp --dport 1024:5352 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 5354:35663 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 35665:65534 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --dport 3478 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --dport 3479 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --dport 3478 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --dport 3479 -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
 # Possible ME comm and other strange staf used by piracy and hackers ####
 ip6tables -A OUTPUT -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
