@@ -173,8 +173,6 @@ iptables -A OUTPUT -p udp --dport 1024:5352 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 5354:42739 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 42741:65534 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
-iptables -A OUTPUT -p udp --dport 3478 -j LOG_AND_DROP
-iptables -A OUTPUT -p udp --dport 3479 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --dport 3478 -j LOG_AND_DROP
 iptables -A OUTPUT -p tcp --dport 3479 -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
@@ -319,8 +317,6 @@ ip6tables -A OUTPUT -p udp --dport 1024:5352 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 5354:35663 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 35665:65534 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p udp --dport 1646 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --dport 3478 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --dport 3479 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --dport 3478 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --dport 3479 -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
