@@ -125,10 +125,10 @@ iptables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
 ######################################################################
 iptables -A INPUT -p dccp -j LOG_AND_REJECT
 iptables -A INPUT -p sctp -j LOG_AND_REJECT
-iptables -A INPUT -p udp --match multiport --sport 1:21 -j LOG_AND_REJECT
-iptables -A INPUT -p udp --match multiport --dport 1:50 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --match multiport --sport 1:21 -j LOG_AND_REJECT
-iptables -A INPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_REJECT
+iptables -A INPUT -p udp --match multiport --sport 0:21 -j LOG_AND_REJECT
+iptables -A INPUT -p udp --match multiport --dport 0:50 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --match multiport --sport 0:21 -j LOG_AND_REJECT
+iptables -A INPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_REJECT
 iptables -A INPUT -p udp --dport 664 -j LOG_AND_REJECT
 iptables -A INPUT -p tcp --sport 664 -j LOG_AND_REJECT
 iptables -A INPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_REJECT
@@ -157,10 +157,10 @@ iptables -A OUTPUT -p tcp -j bad_tcp_packets
 # iptables -A FORWARD -f -j LOG_AND_DROP
 # iptables -A FORWARD -p tcp -j bad_tcp_packets
 # iptables -A OUTPUT -p udp --dport 68 -j LOG_AND_DROP
-iptables -A OUTPUT -p tcp --match multiport --dport 1:21 -j LOG_AND_DROP
-iptables -A OUTPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_DROP
-iptables -A OUTPUT -p udp --match multiport --dport 1:21 -j LOG_AND_DROP
-iptables -A OUTPUT -p udp --match multiport --sport 1:50 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --match multiport --dport 0:21 -j LOG_AND_DROP
+iptables -A OUTPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --match multiport --dport 0:21 -j LOG_AND_DROP
+iptables -A OUTPUT -p udp --match multiport --sport 0:50 -j LOG_AND_DROP
 iptables -A OUTPUT -p udp --dport 664 -j LOG_AND_REJECT
 iptables -A OUTPUT -p tcp --sport 664 -j LOG_AND_REJECT
 iptables -A OUTPUT -p udp --match multiport --sport 16992:16996 -j LOG_AND_DROP
@@ -265,10 +265,10 @@ ip6tables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
 ##########################################################################
 ip6tables -A INPUT -p dccp -j LOG_AND_REJECT
 ip6tables -A INPUT -p sctp -j LOG_AND_REJECT
-ip6tables -A INPUT -p udp --match multiport --sport 1:50 -j LOG_AND_REJECT
-ip6tables -A INPUT -p udp --match multiport --dport 1:50 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_REJECT
-ip6tables -A INPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_REJECT
+ip6tables -A INPUT -p udp --match multiport --sport 0:50 -j LOG_AND_REJECT
+ip6tables -A INPUT -p udp --match multiport --dport 0:50 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_REJECT
+ip6tables -A INPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_REJECT
 ip6tables -A INPUT -s ${V6BLOCKLIST} -j LOG_AND_REJECT
 # Possible ME comm and other strange staf used by piracy and hackers #####
 ip6tables -A INPUT -i lo -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
@@ -300,10 +300,10 @@ ip6tables -A OUTPUT -m ipv6header --header frag --soft -j LOG_AND_DROP
 # ip6tables -A FORWARD -p tcp -j bad_tcp_packets
 # ip6tables -A FORWARD -m ipv6header --header frag --soft -j LOG_AND_DROP
 # ip6tables -A OUTPUT -p udp --dport 547 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p tcp --match multiport --dport 1:50 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p tcp --match multiport --sport 1:50 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --match multiport --dport 1:50 -j LOG_AND_DROP
-ip6tables -A OUTPUT -p udp --match multiport --sport 1:50 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --match multiport --dport 0:50 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p tcp --match multiport --sport 0:50 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --match multiport --dport 0:50 -j LOG_AND_DROP
+ip6tables -A OUTPUT -p udp --match multiport --sport 0:50 -j LOG_AND_DROP
 # #######################################################################
 ip6tables -A OUTPUT -p udp --sport 664 -j LOG_AND_DROP
 ip6tables -A OUTPUT -p tcp --sport 664 -j LOG_AND_DROP
