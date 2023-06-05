@@ -111,6 +111,12 @@ iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP_T
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 
+iptables -A OUTPUT -m owner --cmd-owner i3 -j LOG_AND_DROP
+iptables -A OUTPUT -m owner --cmd-owner sddm -j LOG_AND_DROP
+iptables -A OUTPUT -m owner --cmd-owner Xorg -j LOG_AND_DROP
+iptables -A OUTPUT -m owner --cmd-owner X -j LOG_AND_DROP
+iptables -A OUTPUT -m owner --cmd-owner Xephyr -j LOG_AND_DROP
+
 ip6tables -N TCP
 ip6tables -N UDP
 ip6tables -N LOG_AND_DROP
@@ -183,6 +189,8 @@ ip6tables -A OUTPUT -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
 ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
+
+ip6tables -A OUTPUT -j DROP
 
 ip6tables -t raw -A PREROUTING -m rpfilter --invert -j DROP
 ip6tables -A INPUT -j LOG_AND_REJECT
