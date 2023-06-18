@@ -26,6 +26,12 @@ ip6tables -t raw -X
 ip6tables -t nat -X
 ip6tables -t mangle -X
 
+ip -s neighbour flush all
+arptables --flush
+arptables -P INPUT DROP
+arptables -A INPUT --source-mac 00:0f:53:08:d7:0c -j ACCEPT
+arptables -A OUTPUT --source-mac 00:0f:53:08:d7:0c -j ACCEPT
+
 iptables -N TCP
 iptables -N UDP
 iptables -N LOG_AND_DROP
@@ -94,6 +100,7 @@ iptables -A INPUT -p tcp --syn -m conntrack --ctstate NEW -j TCP
 iptables -A INPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 
 iptables -t raw -A PREROUTING -m rpfilter --invert -j DROP
+iptables -t raw -A PREROUTING -m length --length 8 -j DROP
 iptables -A INPUT -j LOG_AND_REJECT
 
 iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP_E
@@ -111,20 +118,22 @@ iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP_T
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
 
-# iptables -A OUTPUT -o lo -j ACCEPT
-# iptables -A OUTPUT -m conntrack --ctstate ESTABLISHED -j ACCEPT
-# iptables -A OUTPUT -j LOG_AND_DROP
+iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A OUTPUT -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -j LOG_AND_DROP
 
 # iptables -A OUTPUT -m owner ! --gid-owner internet -j LOG_AND_DROP
-# sudo chown max:internet /usr/bin/emacs-28.2
+# sudo chown max:internet /usr/bin/{emacs-28.2.emacs}
 # sudo chown max:internet /usr/bin/{pppd,pppdump,pppoe-discovery,pppstats}
 # sudo chown max:internet /usr/bin/NetworkManager
 # sudo chown max:internet /usr/bin/google-chrome-stable
+# sudo chown max:internet /usr/bin/firefox
 # sudo chown max:internet /usr/bin/etherape
 # sudo chown max:internet /usr/bin/alacritty
 # sudo chown max:internet /usr/bin/liferea
 # sudo chown max:internet /usr/bin/telegram-desktop
 # sudo chown max:internet /usr/bin/teiler
+
 # iptables -A OUTPUT -m owner --cmd-owner i3 -j LOG_AND_DROP
 # iptables -A OUTPUT -m owner --cmd-owner sddm -j LOG_AND_DROP
 # iptables -A OUTPUT -m owner --cmd-owner Xorg -j LOG_AND_DROP
@@ -207,6 +216,7 @@ ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level
 ip6tables -A OUTPUT -j DROP
 
 ip6tables -t raw -A PREROUTING -m rpfilter --invert -j DROP
+ip6tables -t raw -A PREROUTING -m length --length 8 -j DROP
 ip6tables -A INPUT -j LOG_AND_REJECT
 
 
