@@ -30,9 +30,9 @@ ip -s neighbour flush all
 arptables --flush
 arptables -P INPUT DROP
 arptables -P OUTPUT DROP
-arptables -A INPUT --source-mac 00:0f:53:08:d7:0c -j ACCEPT
+arptables -A INPUT --source-mac 00:0f:53:08:d7:0c --destination-mac 08:be:ac:22:9f:b4 -j ACCEPT
 arptables -A INPUT -j DROP
-arptables -A OUTPUT --source-mac 00:0f:53:08:d7:0c -j ACCEPT
+arptables -A OUTPUT --source-mac 08:be:ac:22:9f:b4 --destination-mac 00:0f:53:08:d7:0c -j ACCEPT
 arptables -A OUTPUT -j DROP
 
 iptables -N TCP
