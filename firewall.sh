@@ -29,8 +29,11 @@ ip6tables -t mangle -X
 ip -s neighbour flush all
 arptables --flush
 arptables -P INPUT DROP
+arptables -P OUTPUT DROP
 arptables -A INPUT --source-mac 00:0f:53:08:d7:0c -j ACCEPT
+arptables -A INPUT -j DROP
 arptables -A OUTPUT --source-mac 00:0f:53:08:d7:0c -j ACCEPT
+arptables -A OUTPUT -j DROP
 
 iptables -N TCP
 iptables -N UDP
