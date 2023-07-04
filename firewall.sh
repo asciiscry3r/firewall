@@ -120,22 +120,25 @@ iptables -A OUTPUT -p tcp -j bad_tcp_packets
 iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
 iptables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP_T
 iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
+iptables -A OUTPUT -m owner --gid-owner lock_internet -j LOG_AND_DROP
 
 iptables -A OUTPUT -o lo -j ACCEPT
 iptables -A OUTPUT -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEPT
 iptables -A OUTPUT -j LOG_AND_DROP
 
-# iptables -A OUTPUT -m owner ! --gid-owner internet -j LOG_AND_DROP
-# sudo chown max:internet /usr/bin/{emacs-28.2.emacs}
-# sudo chown max:internet /usr/bin/{pppd,pppdump,pppoe-discovery,pppstats}
-# sudo chown max:internet /usr/bin/NetworkManager
-# sudo chown max:internet /usr/bin/google-chrome-stable
-# sudo chown max:internet /usr/bin/firefox
-# sudo chown max:internet /usr/bin/etherape
-# sudo chown max:internet /usr/bin/alacritty
-# sudo chown max:internet /usr/bin/liferea
-# sudo chown max:internet /usr/bin/telegram-desktop
-# sudo chown max:internet /usr/bin/teiler
+iptables -A OUTPUT -m owner --gid-owner lock_internet -j LOG_AND_DROP
+
+chown root:lock_internet /usr/bin/i3-with-shmlog
+chown root:lock_internet /usr/bin/i3
+chown root:lock_internet /usr/bin/X
+chown root:lock_internet /usr/bin/Xorg
+chown root:lock_internet /usr/bin/Xephyr
+
+chmod g+s /usr/bin/i3-with-shmlog
+chmod g+s /usr/bin/i3
+chmod g+s /usr/bin/X
+chmod g+s /usr/bin/Xorg
+chmod g+s /usr/bin/Xephyr
 
 # iptables -A OUTPUT -m owner --cmd-owner i3 -j LOG_AND_DROP
 # iptables -A OUTPUT -m owner --cmd-owner sddm -j LOG_AND_DROP
