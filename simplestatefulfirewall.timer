@@ -1,0 +1,10 @@
+[Unit]
+Description=Start/Restart Simple Stateful Firewall service
+
+[Timer]
+Unit=simplestatefulfirewall.service
+OnBootSec=1min
+OnUnitInactiveSec=12h
+
+[Install]
+WantedBy=timers.target

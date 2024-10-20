@@ -1,7 +1,0 @@
-[Unit]
-Description=Simple Statefull firewall
-[Service]
-Type=oneshot
-ExecStart=/usr/bin/simplestatefullfirewall.sh
-[Install]
-WantedBy=multi-user.target

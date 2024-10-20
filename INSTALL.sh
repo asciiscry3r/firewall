@@ -1,28 +1,28 @@
 #!/usr/bin/env bash
 
-function install_simplestatefullfirewall {
-  cp simplestatefullfirewall.service /usr/lib/systemd/system/simplestatefullfirewall.service
-  cp simplestatefullfirewall.timer /usr/lib/systemd/system/simplestatefullfirewall.timer
-  cp simplestatefullfirewall.sh /usr/bin/simplestatefullfirewall.sh
-  chmod 640 /usr/lib/systemd/system/simplestatefullfirewall.service
-  chmod 640 /usr/lib/systemd/system/simplestatefullfirewall.timer
-  chmod u=rwx,g=rx /usr/bin/simplestatefullfirewall.sh
+function install_simplestatefulfirewall {
+  yes | sudo cp -rf simplestatefulfirewall.service /usr/lib/systemd/system/simplestatefulfirewall.service
+  yes | sudo cp -rf simplestatefulfirewall.timer /usr/lib/systemd/system/simplestatefulfirewall.timer
+  yes | sudo cp -rf simplestatefulfirewall.sh /usr/bin/simplestatefulfirewall.sh
+  chmod 0640 /usr/lib/systemd/system/simplestatefulfirewall.service
+  chmod 0640 /usr/lib/systemd/system/simplestatefulfirewall.timer
+  chmod u=rwx,g=rx /usr/bin/simplestatefulfirewall.sh
   systemctl daemon-reload
 }
 
-if [ ! -f /usr/lib/systemd/system/simplestatefullfirewall.service ]; then
-    install_simplestatefullfirewall
+if [ ! -f /usr/lib/systemd/system/simplestatefulfirewall.service ]; then
+    install_simplestatefulfirewall
 fi
 
-if [ ! -f /usr/lib/systemd/system/simplestatefullfirewall.timer ]; then
-    install_simplestatefullfirewall
-    systemctl start simplestatefullfirewall.timer
-    systemctl enable simplestatefullfirewall.timer
+if [ ! -f /usr/lib/systemd/system/simplestatefulfirewall.timer ]; then
+    install_simplestatefulfirewall
+    systemctl start simplestatefulfirewall.timer
+    systemctl enable simplestatefulfirewall.timer
 else
-    systemctl start simplestatefullfirewall.timer
-    systemctl enable simplestatefullfirewall.timer
+    systemctl start simplestatefulfirewall.timer
+    systemctl enable simplestatefulfirewall.timer
 fi
 
-if [ ! -f /usr/bin/simplestatefullfirewall.sh ]; then
-    install_simplestatefullfirewall
+if [ ! -f /usr/bin/simplestatefulfirewall.sh ]; then
+    install_simplestatefulfirewall
 fi

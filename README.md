@@ -1,4 +1,4 @@
-# Simple Statefull Firewall
+# Simple Stateful Firewall
 Packet filtering for self defence
  
 Disable ufw or other preinstalled firewall
