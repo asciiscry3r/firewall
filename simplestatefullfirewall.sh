@@ -6,6 +6,8 @@
 # https://wiki.archlinux.org/title/simple_stateful_firewall
 # https://ipgeolocation.io/resources/bogon.html
 
+modprobe br_netfilter
+
 iptables -F
 iptables -t raw -F
 iptables -t nat -F
@@ -26,18 +28,19 @@ ip6tables -t raw -X
 ip6tables -t nat -X
 ip6tables -t mangle -X
 
-ip -s neighbour flush all
-arptables --flush
-arptables -P INPUT DROP
-arptables -P OUTPUT DROP
-arptables -A INPUT --source-mac 00:0f:53:08:d7:0c --destination-mac 08:be:ac:22:9f:b4 -j ACCEPT
-arptables -A INPUT -j DROP
-arptables -A OUTPUT --source-mac 08:be:ac:22:9f:b4 --destination-mac 00:0f:53:08:d7:0c -j ACCEPT
-arptables -A OUTPUT -j DROP
+#ip -s neighbour flush all
+#arptables --flush
+#arptables -P INPUT DROP
+#arptables -P OUTPUT DROP
+#arptables -A INPUT --source-mac 00:0f:53:08:d7:0c --destination-mac 08:be:ac:22:a2:75 -j ACCEPT
+#arptables -A INPUT -j DROP
+#arptables -A OUTPUT --source-mac 08:be:ac:22:a2:75 --destination-mac 00:0f:53:08:d7:0c -j ACCEPT
+#arptables -A OUTPUT -j DROP
 
 iptables -N TCP
 iptables -N UDP
 iptables -N LOG_AND_DROP
+iptables -N LOG_AND_DROP_OUT
 iptables -N LOG_AND_DROP_T
 iptables -N LOG_AND_DROP_E
 iptables -N LOG_AND_REJECT
@@ -55,8 +58,11 @@ iptables -A LOG_AND_DROP_T -j LOG --log-prefix "Iptables: v4Deny Torrents: " --l
 iptables -A LOG_AND_DROP_T -j DROP
 iptables -A LOG_AND_DROP_E -j LOG --log-prefix "Iptables: v4Deny Exploits: " --log-level 7
 iptables -A LOG_AND_DROP_E -j DROP
+iptables -A LOG_AND_DROP_OUT -j LOG --log-prefix "Iptables: v4Deny Out: " --log-level 7
+iptables -A LOG_AND_DROP_OUT -j DROP
 
-BLOCKLIST="100.64.0.0/10,127.0.53.53,169.254.0.0/16,192.0.0.0/24,192.0.2.0/24,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,240.0.0.0/4,255.255.255.255/32,35.190.56.182/32,52.73.169.169"
+# 10.0.0.0/8
+BLOCKLIST="0.0.0.0/8,100.64.0.0/10,169.254.0.0/16,172.16.0.0/12,192.0.0.0/24,192.0.2.0/24,192.88.99.0/24,198.18.0.0/15,198.51.100.0/24,203.0.113.0/24,224.0.0.0/4,240.0.0.0/4"
 
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
 iptables -A bad_tcp_packets -p tcp -m limit -m length --length 20 -j LOG \
@@ -76,10 +82,10 @@ iptables -A INPUT -p icmp -s 0/0 --icmp-type 11 -j ACCEPT
 iptables -A INPUT -p icmp --icmp-type echo-request -m length --length 86:0xffff -j DROP
 iptables -A INPUT -p icmp -j DROP
 
-iptables -A INPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP_E
-iptables -A INPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP_E
-iptables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP_E
-iptables -A INPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_DROP_E
+iptables -A INPUT ! -i lo ! -d 127.0.0.1 -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP_E
+iptables -A INPUT ! -i lo ! -d 127.0.0.1 -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP_E
+iptables -A INPUT ! -i lo ! -d 127.0.0.1 -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP_E
+iptables -A INPUT ! -i lo ! -d 127.0.0.1 -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_DROP_E
 iptables -A INPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP_E
 iptables -A INPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP_E
 iptables -A INPUT -p tcp \
@@ -106,36 +112,38 @@ iptables -t raw -A PREROUTING -m rpfilter --invert -j DROP
 iptables -t raw -A PREROUTING -m length --length 8 -j DROP
 iptables -A INPUT -j LOG_AND_REJECT
 
-iptables -A OUTPUT -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP_E
-iptables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP_E
-iptables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP_E
-iptables -A OUTPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_DROP_E
+iptables -A OUTPUT ! -s 127.0.0.1 -m string --algo bm --hex-string '|28 29 20 7B|' -j LOG_AND_DROP_E
+iptables -A OUTPUT ! -s 127.0.0.1 -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LOG_AND_DROP_E
+iptables -A OUTPUT ! -s 127.0.0.1 -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP_E
+iptables -A OUTPUT ! -s 127.0.0.1 -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_DROP_E
 iptables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP_E
 
 iptables -A OUTPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP_E
-iptables -A OUTPUT -p dccp -j LOG_AND_DROP
-iptables -A OUTPUT -p sctp -j LOG_AND_DROP
-iptables -A OUTPUT -f -j LOG_AND_DROP
+iptables -A OUTPUT -p dccp -j LOG_AND_DROP_OUT
+iptables -A OUTPUT -p sctp -j LOG_AND_DROP_OUT
+iptables -A OUTPUT -f -j LOG_AND_DROP_OUT
 iptables -A OUTPUT -p tcp -j bad_tcp_packets
-iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP
+iptables -A OUTPUT -s ${BLOCKLIST} -j LOG_AND_DROP_OUT
 iptables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP_T
-iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
+iptables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-prefix "Iptables: IPT OUTPUT packet died: "
+# iptables -A OUTPUT -m owner --gid-owner lock_internet -j LOG_AND_DROP_OUT
 
-iptables -A OUTPUT -o lo -j ACCEPT
+iptables -A OUTPUT -o lo -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEPT
+iptables -A OUTPUT -o lo -j LOG_AND_DROP_OUT
 iptables -A OUTPUT -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEPT
-iptables -A OUTPUT -j LOG_AND_DROP
+iptables -A OUTPUT -j LOG_AND_DROP_OUT
 
-# iptables -A OUTPUT -m owner ! --gid-owner internet -j LOG_AND_DROP
-# sudo chown max:internet /usr/bin/{emacs-28.2.emacs}
-# sudo chown max:internet /usr/bin/{pppd,pppdump,pppoe-discovery,pppstats}
-# sudo chown max:internet /usr/bin/NetworkManager
-# sudo chown max:internet /usr/bin/google-chrome-stable
-# sudo chown max:internet /usr/bin/firefox
-# sudo chown max:internet /usr/bin/etherape
-# sudo chown max:internet /usr/bin/alacritty
-# sudo chown max:internet /usr/bin/liferea
-# sudo chown max:internet /usr/bin/telegram-desktop
-# sudo chown max:internet /usr/bin/teiler
+# chown root:lock_internet /usr/bin/i3-with-shmlog
+# chown root:lock_internet /usr/bin/i3
+# chown root:lock_internet /usr/bin/X
+# chown root:lock_internet /usr/bin/Xorg
+# chown root:lock_internet /usr/bin/Xephyr
+
+# chmod g+s /usr/bin/i3-with-shmlog
+# chmod g+s /usr/bin/i3
+# chmod g+s /usr/bin/X
+# chmod g+s /usr/bin/Xorg
+# chmod g+s /usr/bin/Xephyr
 
 # iptables -A OUTPUT -m owner --cmd-owner i3 -j LOG_AND_DROP
 # iptables -A OUTPUT -m owner --cmd-owner sddm -j LOG_AND_DROP
@@ -146,6 +154,7 @@ iptables -A OUTPUT -j LOG_AND_DROP
 ip6tables -N TCP
 ip6tables -N UDP
 ip6tables -N LOG_AND_DROP
+ip6tables -N LOG_AND_DROP_OUT
 ip6tables -N LOG_AND_REJECT
 ip6tables -N bad_tcp_packets
 ip6tables -N icmp_packets
@@ -156,10 +165,12 @@ ip6tables -P INPUT DROP
 
 ip6tables -A LOG_AND_DROP -j LOG --log-prefix "Iptables: v6Deny: " --log-level 7
 ip6tables -A LOG_AND_DROP -j DROP
+ip6tables -A LOG_AND_DROP_OUT -j LOG --log-prefix "Iptables: v6Deny: " --log-level 7
+ip6tables -A LOG_AND_DROP_OUT -j DROP
 ip6tables -A LOG_AND_REJECT -j LOG --log-prefix "Iptables: v6Reject: " --log-level 7
 ip6tables -A LOG_AND_REJECT -j REJECT --reject-with icmp6-adm-prohibited
 
-V6BLOCKLIST="::/128,::1/128,::ffff:0:0/96,::/96,100::/64,2001:10::/28,2001:10::/28,2001:db8::/32,fc00::/7,fec0::/10,2600:1901:0:8813::/128,2002::/24,2002:a00::/24,2002:a00::/24,2002:a9fe::/24,2002:ac10::/28,2002:c000::/40,2002:c000:200::/40,2002:c0a8::/32,2002:c612::/31,2002:c633:6400::/40,2002:cb00:7100::/40,2002:e000::/20,2002:f000::/20,2002:ffff:ffff::/48,2001::/40,2001:0:a00::/40,2001:0:7f00::/40,2001:0:c000::/56,2001:0:ac10::/44,2001:0:a9fe::/48,2001:0:c000:200::/56,2001:0:c0a8::/48,2001:0:c612::/47,2001:0:c633:6400::/56,2001:0:cb00:7100::/56,2001:0:e000::/36,2001:0:f000::/36"
+V6BLOCKLIST="::/128,::1/128,::ffff:0:0/96,::/96,100::/64,2001:10::/28,2001:10::/28,2001:db8::/32,fc00::/7,fe80::/128,fec0::/10,2600:1901:0:8813::/128,2002::/24,2002:a00::/24,2002:a00::/24,2002:a9fe::/24,2002:ac10::/28,2002:c000::/40,2002:c000:200::/40,2002:c0a8::/32,2002:c612::/31,2002:c633:6400::/40,2002:cb00:7100::/40,2002:e000::/20,2002:f000::/20,2002:ffff:ffff::/48,2001::/40,2001:0:a00::/40,2001:0:7f00::/40,2001:0:c000::/56,2001:0:ac10::/44,2001:0:a9fe::/48,2001:0:c000:200::/56,2001:0:c0a8::/48,2001:0:c612::/47,2001:0:c633:6400::/56,2001:0:cb00:7100::/56,2001:0:e000::/36,2001:0:f000::/36"
 
 # Copyright (C) 2001  Oskar Andreasson <bluefluxATkoffeinDOTnet>
 ip6tables -A bad_tcp_packets -p tcp  -m limit -m length --length 20 -j LOG \
@@ -206,28 +217,31 @@ ip6tables -A OUTPUT -m string --algo bm --hex-string '|FF FF FF FF FF FF|' -j LO
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|72 70 63 6E 65 74 70 2E 65 78 65 00 72 70 63 6E 65 74 70 00|' -j LOG_AND_DROP
 ip6tables -A OUTPUT -m string --algo bm --hex-string '|D1 E0 F5 8B 4D 0C 83 D1 00 8B EC FF 33 83 C3 04|' -j LOG_AND_DROP
-ip6tables -A OUTPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP
+ip6tables -A OUTPUT -m u32 --u32 "8&0xFFF=0x4d5a" -j LOG_AND_DROP_OUT
+ip6tables -A OUTPUT -s ${V6BLOCKLIST} -j LOG_AND_DROP_OUT
 ip6tables -A OUTPUT -p tcp -j bad_tcp_packets
-ip6tables -A OUTPUT -m ipv6header --header frag --soft -j LOG_AND_DROP
-ip6tables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP
-ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-level DEBUG --log-prefix "Iptables: IPT OUTPUT packet died: "
+ip6tables -A OUTPUT -m ipv6header --header frag --soft -j LOG_AND_DROP_OUT
+ip6tables -A OUTPUT -m string --algo bm --string “BitTorrent” -j LOG_AND_DROP_OUT
+ip6tables -A OUTPUT -s ::1/32 -p ICMP -m limit -j LOG_AND_DROP_OUT
+ip6tables -A OUTPUT -s ::1/32 -p UDP -m limit --sport 53 -j LOG_AND_DROP_OUT
+ip6tables -A OUTPUT -s ::1/32 -p TCP -m limit --sport 53 -j LOG_AND_DROP_OUT
+ip6tables -A OUTPUT -m limit --limit 3/minute --limit-burst 3 -j LOG --log-prefix "Iptables: IPT OUTPUT packet died: "
 
-ip6tables -A OUTPUT -j DROP
+ip6tables -A OUTPUT -o lo -j LOG_AND_DROP_OUT
+ip6tables -A OUTPUT -j LOG_AND_DROP_OUT
+
+ip6tables -A INPUT -j LOG_AND_REJECT
 
 ip6tables -t raw -A PREROUTING -m rpfilter --invert -j DROP
 ip6tables -t raw -A PREROUTING -m length --length 8 -j DROP
-ip6tables -A INPUT -j LOG_AND_REJECT
 
+iptables -t mangle -A PREROUTING -m rpfilter --invert -j DROP
+iptables -t mangle -A PREROUTING -m length --length 8 -j DROP
+iptables -t mangle -A PREROUTING -j ACCEPT
 
-iptables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
-iptables -t mangle -A PREROUTING -j DROP
-
-ip6tables -t mangle -A PREROUTING -m rpfilter -j ACCEPT
-ip6tables -t mangle -A PREROUTING -j DROP
+ip6tables -t mangle -A PREROUTING -m rpfilter --invert -j DROP
+ip6tables -t mangle -A PREROUTING -m length --length 8 -j DROP
+ip6tables -t mangle -A PREROUTING -j ACCEPT
 
 
 release=`grep -e '^ID=' /etc/os-release |  cut -c 4-`
