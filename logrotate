@@ -1,8 +1,0 @@
-/var/log/iptables.log {
-    daily
-    rotate 30
-    compress
-    missingok
-    notifyempty
-    sharedscripts
-}
