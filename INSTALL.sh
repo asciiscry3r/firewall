@@ -7,11 +7,16 @@ function install_simplestatefulfirewall {
     chmod 0640 /usr/lib/systemd/system/simplestatefulfirewall.service
     chmod 0640 /usr/lib/systemd/system/simplestatefulfirewall.timer
     chmod 0750 /usr/bin/simplestatefulfirewall.sh
+    chown root:root /usr/lib/systemd/system/simplestatefulfirewall.service
+    chown root:root /usr/lib/systemd/system/simplestatefulfirewall.timer
+    chown root:root /usr/bin/simplestatefulfirewall.sh
     systemctl daemon-reload
 }
 
 function install_settingstosysctl {
     yes | sudo cp -rf sysctl.conf /etc/sysctl.conf
+    chown root:root /etc/sysctl.conf
+    chmod 640 /etc/sysctl.conf
     sysctl -p /etc/sysctl.conf
     interfaces=(`sudo  sysctl -a | grep accept_redirects | awk 'BEGIN{FS="."} {print $4}'`)
 
