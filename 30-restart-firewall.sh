@@ -10,6 +10,6 @@ case $ACTION in
 	systemctl restart simplestatefulfirewall.service
 	;;
     down)
-	systemctl restart simplestatefulfirewall.servic
+	systemctl restart simplestatefulfirewall.service
 	;;
 esac
