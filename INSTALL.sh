@@ -6,7 +6,7 @@ function install_simplestatefulfirewall {
     yes | sudo cp -rf simplestatefulfirewall.sh /usr/bin/simplestatefulfirewall.sh
     chmod 0640 /usr/lib/systemd/system/simplestatefulfirewall.service
     chmod 0640 /usr/lib/systemd/system/simplestatefulfirewall.timer
-    chmod u=rwx,g=rx /usr/bin/simplestatefulfirewall.sh
+    chmod 0750 /usr/bin/simplestatefulfirewall.sh
     systemctl daemon-reload
 }
 
@@ -37,6 +37,19 @@ function install_settingstosysctl {
 	sudo sysctl -w net.ipv6.conf."${i}".disable_ipv6=1
     done
 }
+
+function install_dispatcher_scripts {
+    mkdir -p /etc/systemd/system/NetworkManager-dispatcher.service.d/
+    yes | sudo cp -rf remain_after_exit.conf /etc/systemd/system/NetworkManager-dispatcher.service.d/remain_after_exit.conf
+    yes | sudo cp -rf 30-restart-firewall.sh /etc/NetworkManager/dispatcher.d/30-restart-firewall.sh 
+    chown root:root /etc/systemd/system/NetworkManager-dispatcher.service.d/remain_after_exit.conf
+    chown root:root /etc/NetworkManager/dispatcher.d/30-restart-firewall.sh 
+    chmod 0750 /etc/NetworkManager/dispatcher.d/30-restart-firewall.sh
+    chmod 0640 /etc/systemd/system/NetworkManager-dispatcher.service.d/remain_after_exit.conf
+    systemctl daemon-reload
+}
+
+install_dispatcher_scripts
 
 install_settingstosysctl
 

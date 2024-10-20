@@ -67,6 +67,8 @@ ip6tables -t mangle -X
 #arptables -A OUTPUT --source-mac 08:be:ac:22:a2:75 --destination-mac 00:0f:53:08:d7:0c -j ACCEPT
 #arptables -A OUTPUT -j DROP
 
+#### IpV4
+
 iptables -N TCP
 iptables -N UDP
 iptables -N LOG_AND_DROP
@@ -181,6 +183,8 @@ iptables -A OUTPUT -j LOG_AND_DROP_OUT
 # iptables -A OUTPUT -m owner --cmd-owner X -j LOG_AND_DROP
 # iptables -A OUTPUT -m owner --cmd-owner Xephyr -j LOG_AND_DROP
 
+#### IpV6
+
 ip6tables -N TCP
 ip6tables -N UDP
 ip6tables -N LOG_AND_DROP
@@ -264,6 +268,8 @@ ip6tables -A INPUT -j LOG_AND_REJECT
 
 ip6tables -t raw -A PREROUTING -m rpfilter --invert -j DROP
 ip6tables -t raw -A PREROUTING -m length --length 8 -j DROP
+
+#### Mangle
 
 iptables -t mangle -A PREROUTING -m rpfilter --invert -j DROP
 iptables -t mangle -A PREROUTING -m length --length 8 -j DROP
