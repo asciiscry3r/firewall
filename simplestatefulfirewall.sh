@@ -8,7 +8,13 @@
 
 function install_settingstosysctl {
     yes | sudo cp -rf sysctl.conf /etc/sysctl.conf
-    sysctl -p /etc/sysctl.conf
+
+    if [ -f /etc/sysctl.conf ]; then
+	sysctl -p /etc/sysctl.conf
+    elif [ -f /etc/sysctl.d/00-sysctl.conf ]; then
+	sysctl -p /etc/sysctl.d/00-sysctl.conf
+    fi
+
     interfaces=(`sudo  sysctl -a | grep accept_redirects | awk 'BEGIN{FS="."} {print $4}'`)
 
     for i in "${interfaces[@]}"; do
@@ -57,15 +63,6 @@ ip6tables -X
 ip6tables -t raw -X
 ip6tables -t nat -X
 ip6tables -t mangle -X
-
-#ip -s neighbour flush all
-#arptables --flush
-#arptables -P INPUT DROP
-#arptables -P OUTPUT DROP
-#arptables -A INPUT --source-mac 00:0f:53:08:d7:0c --destination-mac 08:be:ac:22:a2:75 -j ACCEPT
-#arptables -A INPUT -j DROP
-#arptables -A OUTPUT --source-mac 08:be:ac:22:a2:75 --destination-mac 00:0f:53:08:d7:0c -j ACCEPT
-#arptables -A OUTPUT -j DROP
 
 #### IpV4
 
@@ -164,24 +161,6 @@ iptables -A OUTPUT -o lo -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEP
 iptables -A OUTPUT -o lo -j LOG_AND_DROP_OUT
 iptables -A OUTPUT -m conntrack --ctstate NEW,RELATED,ESTABLISHED -j ACCEPT
 iptables -A OUTPUT -j LOG_AND_DROP_OUT
-
-# chown root:lock_internet /usr/bin/i3-with-shmlog
-# chown root:lock_internet /usr/bin/i3
-# chown root:lock_internet /usr/bin/X
-# chown root:lock_internet /usr/bin/Xorg
-# chown root:lock_internet /usr/bin/Xephyr
-
-# chmod g+s /usr/bin/i3-with-shmlog
-# chmod g+s /usr/bin/i3
-# chmod g+s /usr/bin/X
-# chmod g+s /usr/bin/Xorg
-# chmod g+s /usr/bin/Xephyr
-
-# iptables -A OUTPUT -m owner --cmd-owner i3 -j LOG_AND_DROP
-# iptables -A OUTPUT -m owner --cmd-owner sddm -j LOG_AND_DROP
-# iptables -A OUTPUT -m owner --cmd-owner Xorg -j LOG_AND_DROP
-# iptables -A OUTPUT -m owner --cmd-owner X -j LOG_AND_DROP
-# iptables -A OUTPUT -m owner --cmd-owner Xephyr -j LOG_AND_DROP
 
 #### IpV6
 
