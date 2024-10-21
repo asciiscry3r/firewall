@@ -7,7 +7,6 @@
 # https://ipgeolocation.io/resources/bogon.html
 
 function install_settingstosysctl {
-    yes | sudo cp -rf sysctl.conf /etc/sysctl.conf
 
     if [ -f /etc/sysctl.conf ]; then
 	sysctl -p /etc/sysctl.conf
